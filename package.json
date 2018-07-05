@@ -7,7 +7,7 @@
     "start": "node ./bin/www",
     "startDev": "DEBUG=applications-service:* nodemon ./bin/www",
     "test": "eslint .",
-    "format": "prettier --write {apps,bin,models,services}/**/* README.md"
+    "format": "prettier --single-quote --write {apps,models,services}/**/* README.md"
   },
   "eslintConfig": {
     "plugins": ["node"],

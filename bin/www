@@ -2,7 +2,7 @@
 const app = require("../app");
 const debug = require("debug")("applications-service:server");
 const http = require("http");
-const models = require('../models');
+const models = require("../models");
 
 /**
  * Get port from environment and store in Express.

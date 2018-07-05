@@ -23,9 +23,8 @@
     {% if applicationData %}
         <h2><strong>Application reference</strong>: {{ applicationData.reference_id }}</h2>
         <h5>
-            {{ applicationData.createdAt }}
-            {# {{ formatDate(applicationData.createdAt, DATE_FORMATS.fullTimestamp) }} #}
-            {# <small title="{{ applicationData.createdAt }}">{{ timeFromNow(applicationData.createdAt) }}</small> #}
+            {{ applicationData.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
+            <small title="{{ applicationData.createdAt }}">{{ applicationData.createdAt | timeFromNow }}</small>
         </h5>
         <div class="card">
             <div class="card-body">
@@ -72,10 +71,9 @@
                        href="./{{ formId }}/{{ application.reference_id }}">
                         <div class="d-flex w-100 justify-content-between">
                             <h3 class="h6">
-                                {{ application.createdAt }}
-                                {# {{ formatDate(application.createdAt, DATE_FORMATS.fullTimestamp) }} #}
+                                {{ application.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
                             </h3>
-                            {# <small title="{{ application.createdAt }}">{{ timeFromNow(application.createdAt) }}</small> #}
+                            <small title="{{ application.createdAt }}">{{ application.createdAt | timeFromNow }}</small>
                         </div>
                         <p class="mb-0"><strong>Application reference</strong>: {{ application.reference_id }}</p>
                     </a>

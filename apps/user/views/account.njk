@@ -1,0 +1,16 @@
+{% extends "./layout.njk" %}
+{% block title %}Account{% endblock %}
+
+{% block content %}
+    {% if not user %}
+        <h2>Welcome! Please log in.</h2>
+        <a href="/user/login/">Log In</a>
+    {% else %}
+        <p>UPN: {{ user._json.upn }}</p>
+        <p>Profile ID: {{ user.id }}</p>
+        <pre>
+            {{ user | dump(4) }}
+        </pre>
+        <p><a href="/user/logout">Log Out</a></p>
+    {% endif %}
+{% endblock %}

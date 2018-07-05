@@ -1,24 +1,24 @@
-"use strict";
-const express = require("express");
-const logger = require("morgan");
-const nunjucks = require("nunjucks");
-const moment = require("moment");
+'use strict';
+const express = require('express');
+const logger = require('morgan');
+const nunjucks = require('nunjucks');
+const moment = require('moment');
 
-const dashboardRoute = require("./dashboard");
+const dashboardRoute = require('./dashboard');
 
 const app = express();
 
-app.use(logger("dev"));
+app.use(logger('dev'));
 
 app.locals.DATE_FORMATS = {
-  short: "D MMMM, YYYY",
-  full: "dddd D MMMM YYYY",
-  fullTimestamp: "dddd D MMM YYYY (hh:mm a)"
+    short: 'D MMMM, YYYY',
+    full: 'dddd D MMMM YYYY',
+    fullTimestamp: 'dddd D MMM YYYY (hh:mm a)'
 };
 
-const templateEnv = nunjucks.configure(".", {
-  autoescape: true,
-  express: app
+const templateEnv = nunjucks.configure('.', {
+    autoescape: true,
+    express: app
 });
 
 /**
@@ -27,19 +27,19 @@ const templateEnv = nunjucks.configure(".", {
  * @param {String} format
  * @see https://momentjs.com/docs/#/displaying/format/
  */
-templateEnv.addFilter("formatDate", function(dateString, format) {
-  return moment(dateString).format(format);
+templateEnv.addFilter('formatDate', function(dateString, format) {
+    return moment(dateString).format(format);
 });
 
 /**
  * View helper to represent date as relative time
  * @param {String} dateString
  */
-templateEnv.addFilter("timeFromNow", function(dateString) {
-  return moment(dateString).fromNow();
+templateEnv.addFilter('timeFromNow', function(dateString) {
+    return moment(dateString).fromNow();
 });
 
-app.set("view engine", "njk").set("engineEnv", templateEnv);
+app.set('view engine', 'njk').set('engineEnv', templateEnv);
 
 dashboardRoute(app);
 

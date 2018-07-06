@@ -16,7 +16,7 @@ app.locals.DATE_FORMATS = {
 
 router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (req, res, next) => {
     try {
-        const {formId, applicationId} = req.params;
+        const { formId, applicationId } = req.params;
 
         const viewData = {
             formId,

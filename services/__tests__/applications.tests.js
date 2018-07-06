@@ -63,7 +63,7 @@ test('should reference short id', function() {
 test('should get all available forms', async function() {
     const availableForms = await applicationsService.getAvailableForms();
     expect(availableForms).toHaveLength(2);
-})
+});
 
 test('should get all applications for a given form', async function() {
     const applications = await applicationsService.getApplicationsByForm('test-form-1');

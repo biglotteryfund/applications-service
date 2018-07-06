@@ -5,8 +5,7 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 const models = require('../models');
 
-module.exports = function(app) {
-
+module.exports = function() {
     const store = new SequelizeStore({
         db: models.sequelize
     });

@@ -28,7 +28,7 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
 
         if (applicationId) {
             // look up a specific application
-            viewData.applicationData = await applicationService.getApplicationsById(applicationId);
+            viewData.applicationData = await applicationService.getApplicationById(applicationId);
 
             if (!viewData.applicationData) {
                 return next();

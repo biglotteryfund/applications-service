@@ -4,6 +4,12 @@ const moment = require('moment');
 
 module.exports = function(app) {
 
+    app.locals.DATE_FORMATS = {
+        short: 'D MMMM, YYYY',
+        full: 'dddd D MMMM YYYY',
+        fullTimestamp: 'dddd D MMM YYYY (hh:mm a)'
+    };
+
     const templateEnv = nunjucks.configure('.', {
         autoescape: true,
         express: app

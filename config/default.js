@@ -22,13 +22,13 @@ module.exports = {
         useCookieInsteadOfSession: true,
         cookieEncryptionKeys: [
             {
-                'key': '12345678901234567890123456789012',
-                'iv': '123456789012'
+                'key': process.env.MS_COOKIE_ENC_KEY_1,
+                'iv': process.env.MS_COOKIE_ENC_IV_1
             },
             {
-                'key': 'abcdefghijklmnopqrstuvwxyzabcdef',
-                'iv': 'abcdefghijkl'
-            }
+                'key': process.env.MS_COOKIE_ENC_KEY_2,
+                'iv': process.env.MS_COOKIE_ENC_IV_2
+            },
         ],
 
         // Optional settings
@@ -39,7 +39,7 @@ module.exports = {
         nonceMaxAmount: 5,
         clockSkew: null,
         resourceURL: 'https://graph.windows.net',
-        destroySessionUrl: 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://localhost:3001/user',
+        destroySessionUrl: `https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=${process.env.MS_LOGOUT_URL}`,
     }
 };
 

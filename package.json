@@ -11,7 +11,10 @@
   },
   "eslintConfig": {
     "plugins": ["node"],
-    "extends": ["eslint:recommended", "plugin:node/recommended"]
+    "extends": ["eslint:recommended", "plugin:node/recommended"],
+    "rules": {
+      "node/shebang": "off"
+    }
   },
   "dependencies": {
     "debug": "~2.6.9",

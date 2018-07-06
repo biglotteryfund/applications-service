@@ -10,8 +10,10 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 const SequelizeStore = require('connect-session-sequelize')(expressSession.Store);
+const { Op } = require('sequelize');
 
 const models = require('../../models');
+const User = models.User;
 
 const app = express();
 
@@ -48,13 +50,31 @@ const templateEnv = nunjucks.configure('.', {
 
 app.set('view engine', 'njk').set('engineEnv', templateEnv);
 
-// array to hold logged in users
-let users = [];
+const createUser = (user) => {
+    return User.create({
+        oid: user.oid,
+        email: user.upn,
+        given_name: user.name.givenName,
+        family_name: user.name.familyName
+    });
+};
 
-// @TODO
-const findByOid = (oid, cb) => {
-    let user = users.find(u => u.oid === oid);
-    return cb(null, user || null);
+const findUser = (oid, cb) => {
+    return User.findOne({
+        where: {
+            oid: {
+                [Op.eq]: oid
+            }
+        }
+    }).then(user => {
+        // update last login date
+        user.changed('updatedAt', true);
+        return user.save().then(() => {
+            return cb(null, user);
+        });
+    }).catch(() => {
+        return cb(null, null);
+    });
 };
 
 passport.serializeUser((user, done) => {
@@ -62,12 +82,10 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((oid, done) => {
-    findByOid(oid, (err, user) => {
+    findUser(oid, (err, user) => {
         done(err, user);
     });
 });
-
-console.log(config.get('auth'));
 
 passport.use(
     new OIDCStrategy(
@@ -97,14 +115,16 @@ passport.use(
             }
             // asynchronous verification, for effect...
             process.nextTick(() => {
-                findByOid(profile.oid, (err, user) => {
+                findUser(profile.oid, (err, user) => {
                     if (err) {
                         return done(err);
                     }
                     if (!user) {
-                        // "Auto-registration"
-                        users.push(profile);
-                        return done(null, profile);
+                        createUser(profile).then(() => {
+                            return done(null, profile);
+                        }).catch(dbErr => {
+                            return done(null, user);
+                        });
                     }
                     return done(null, user);
                 });
@@ -135,7 +155,7 @@ app.get(
         })(req, res, next);
     },
     (req, res) => {
-        res.redirect('/user');
+        return res.redirect('/user');
     }
 );
 
@@ -148,7 +168,7 @@ app.get(
         })(req, res, next);
     },
     (req, res) => {
-        res.redirect('/user');
+        return res.redirect('/user');
     }
 );
 
@@ -161,14 +181,14 @@ app.post(
         })(req, res, next);
     },
     (req, res) => {
-        res.redirect('/user');
+        return res.redirect('/user');
     }
 );
 
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
         req.logOut();
-        res.redirect(config.destroySessionUrl);
+        res.redirect(config.get('auth.destroySessionUrl'));
     });
 });
 

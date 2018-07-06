@@ -39,7 +39,7 @@ module.exports = {
         nonceMaxAmount: 5,
         clockSkew: null,
         resourceURL: 'https://graph.windows.net',
-        destroySessionUrl: 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://localhost:3001',
+        destroySessionUrl: 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=http://localhost:3001/user',
     }
 };
 

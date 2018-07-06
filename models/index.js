@@ -1,11 +1,19 @@
 'use strict';
+const { startsWith } = require('lodash');
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
+const debug = require('debug')('applications-service:models');
 
-const sequelize = new Sequelize(process.env.MYSQL_CONNECTION_URI, {
+const connectionUri = process.env.DB_CONNECTION_URI;
+const useSqlite = process.env.NODE_ENV !== 'production' && startsWith(connectionUri, 'sqlite://');
+const dialect = useSqlite ? 'sqlite' : 'mysql';
+
+debug(`Using ${dialect} database`);
+
+const sequelize = new Sequelize(connectionUri, {
     logging: false,
-    dialect: 'mysql',
+    dialect: dialect,
     define: {
         charset: 'utf8mb4',
         dialectOptions: {

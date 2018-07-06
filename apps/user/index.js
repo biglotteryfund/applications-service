@@ -6,36 +6,41 @@ const router = express.Router();
 
 const auth = require('../../services/auth');
 
-const noCache = (req, res, next) => {
-    res.cacheControl = { noStore: true };
-    next();
-};
-
-router.get('/', noCache, (req, res) => {
-    res.render(path.resolve(__dirname, 'views/index'), {
-        user: req.user
-    });
+router.get('/', (req, res) => {
+    // send the logged-in user to the place they wanted to get to
+    if (req.isAuthenticated() && req.session.redirectUrl) {
+        const redirectUrl = req.session.redirectUrl;
+        delete req.session.redirectUrl;
+        req.session.save(() => {
+            res.redirect(redirectUrl);
+        });
+    } else {
+        res.render(path.resolve(__dirname, 'views/index'), {
+            user: req.user,
+            redirectUrl: req.query.redirectUrl
+        });
+    }
 });
 
-router.get('/account', noCache, auth.ensureAuthenticated, (req, res) => {
+router.get('/account', auth.ensureAuthenticated, (req, res) => {
     res.render(path.resolve(__dirname, 'views/account'), {
         user: req.user
     });
 });
 
-router.get('/login', noCache, auth.authMiddlewareLogin, (req, res) => {
+router.get('/login', auth.authMiddlewareLogin, (req, res) => {
     res.redirect('/user');
 });
 
-router.get('/auth/openid/return', noCache, auth.authMiddleware, (req, res) => {
+router.get('/auth/openid/return', auth.authMiddleware, (req, res) => {
     res.redirect('/user');
 });
 
-router.post('/auth/openid/return', noCache, auth.authMiddleware, (req, res) => {
+router.post('/auth/openid/return', auth.authMiddleware, (req, res) => {
     res.redirect('/user');
 });
 
-router.get('/logout', noCache, (req, res) => {
+router.get('/logout', (req, res) => {
     req.session.destroy(() => {
         req.logOut();
         res.redirect(config.get('auth.destroySessionUrl'));

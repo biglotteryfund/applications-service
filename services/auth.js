@@ -3,18 +3,11 @@ const passport = require('passport');
 const config = require('config');
 
 function ensureAuthenticated(req, res, next) {
-    console.log('mounted', req.path);
-    if (req.user) {
-        console.log('u r authed');
+    if (req.isAuthenticated()) {
         return next();
     } else {
-        console.log('not authed');
         return res.redirect('/user');
-        // return res.send('ok');
-        // return next();
     }
-    // console.log(req.isAuthenticated());
-    // return next();
 }
 
 function authMiddleware(req, res, next) {

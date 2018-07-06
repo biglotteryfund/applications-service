@@ -1,23 +1,10 @@
 'use strict';
 const express = require('express');
-const logger = require('morgan');
 const path = require('path');
 const config = require('config');
-const nunjucks = require('nunjucks');
 const router = express.Router();
 
-// const app = express();
-
-// app.use(logger('dev'));
-
 const auth = require('../../services/auth');
-
-// const templateEnv = nunjucks.configure('.', {
-//     autoescape: true,
-//     express: app
-// });
-//
-// app.set('view engine', 'njk').set('engineEnv', templateEnv);
 
 const noCache = (req, res, next) => {
     res.cacheControl = { noStore: true };
@@ -37,17 +24,14 @@ router.get('/account', noCache, auth.ensureAuthenticated, (req, res) => {
 });
 
 router.get('/login', noCache, auth.authMiddlewareLogin, (req, res) => {
-    console.log('Login was called in the Sample');
     res.redirect('/user');
 });
 
 router.get('/auth/openid/return', noCache, auth.authMiddleware, (req, res) => {
-    console.log('return from Azure');
     res.redirect('/user');
 });
 
 router.post('/auth/openid/return', noCache, auth.authMiddleware, (req, res) => {
-    console.log('return from Azure');
     res.redirect('/user');
 });
 

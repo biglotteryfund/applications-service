@@ -6,13 +6,13 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             {% if applicationData %}
-                <li class="breadcrumb-item"><a href="../">Applications</a></li>
-                <li class="breadcrumb-item"><a href="../{{ formId }}">{{ formTitle }}</a></li>
+                <li class="breadcrumb-item"><a href="/dashboard/">Application Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="/dashboard/{{ formId }}">{{ formTitle }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ applicationData.reference_id }}</li>
             {% elseif forms.length > 0 %}
-                <li class="breadcrumb-item active" aria-current="page">Applications</li>
+                <li class="breadcrumb-item active" aria-current="page">Applications Dashboard</li>
             {% else %}
-                <li class="breadcrumb-item"><a href="./">Applications</a></li>
+                <li class="breadcrumb-item"><a href="/dashboard/">Applications Dashboard</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ formTitle }}</li>
             {% endif %}
         </ol>
@@ -52,7 +52,7 @@
         <div class="list-group">
             {% for form in forms %}
                 <a class="list-group-item list-group-item-action flex-column align-items-start"
-                   href="./{{ form.form_id}}">
+                   href="/dashboard/{{ form.form_id}}">
                     <div class="d-flex w-100 justify-content-between">
                         <h3 class="h6">{{ form.formTitle }}</h3>
                         <span class="badge badge-light">{{ form.toJSON().count}}</span>
@@ -68,7 +68,7 @@
             <div class="list-group">
                 {% for application in applications %}
                     <a class="list-group-item list-group-item-action flex-column align-items-start"
-                       href="./{{ formId }}/{{ application.reference_id }}">
+                       href="/dashboard/{{ formId }}/{{ application.reference_id }}">
                         <div class="d-flex w-100 justify-content-between">
                             <h3 class="h6">
                                 {{ application.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}

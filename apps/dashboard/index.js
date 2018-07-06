@@ -6,16 +6,15 @@ const path = require('path');
 const applicationService = require('../../services/applications');
 const auth = require('../../services/auth');
 
-// const app = express();
-//
-// app.locals.DATE_FORMATS = {
-//     short: 'D MMMM, YYYY',
-//     full: 'dddd D MMMM YYYY',
-//     fullTimestamp: 'dddd D MMM YYYY (hh:mm a)'
-// };
-router.use(auth.ensureAuthenticated);
+const app = express();
 
-router.get('/:formId?/:applicationId?', async (req, res, next) => {
+app.locals.DATE_FORMATS = {
+    short: 'D MMMM, YYYY',
+    full: 'dddd D MMMM YYYY',
+    fullTimestamp: 'dddd D MMM YYYY (hh:mm a)'
+};
+
+router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (req, res, next) => {
     try {
         const {formId, applicationId} = req.params;
 

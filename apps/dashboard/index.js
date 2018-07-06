@@ -1,14 +1,12 @@
 'use strict';
 const express = require('express');
-const logger = require('morgan');
-const nunjucks = require('nunjucks');
-const moment = require('moment');
+const router = express.Router();
+const path = require('path');
 
-const dashboardRoute = require('./dashboard');
+const applicationService = require('../../services/applications');
+const auth = require('../../services/auth');
 
 const app = express();
-
-app.use(logger('dev'));
 
 app.locals.DATE_FORMATS = {
     short: 'D MMMM, YYYY',
@@ -16,31 +14,46 @@ app.locals.DATE_FORMATS = {
     fullTimestamp: 'dddd D MMM YYYY (hh:mm a)'
 };
 
-const templateEnv = nunjucks.configure('.', {
-    autoescape: true,
-    express: app
+router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (req, res, next) => {
+    try {
+        const {formId, applicationId} = req.params;
+
+        const viewData = {
+            formId,
+            forms: [],
+            applications: [],
+            formTitle: null,
+            applicationData: null
+        };
+
+        if (applicationId) {
+            // look up a specific application
+            viewData.applicationData = await applicationService.getApplicationById(applicationId);
+
+            if (!viewData.applicationData) {
+                return next();
+            }
+
+            viewData.formTitle = viewData.applicationData.formTitle;
+        } else if (formId) {
+            // get applications for a given form
+            viewData.applications = await applicationService.getApplicationsByForm(formId);
+
+            if (viewData.applications.length < 1) {
+                return next();
+            }
+
+            viewData.formTitle = viewData.applications[0].formTitle;
+        } else {
+            // fetch all forms instead for a list
+            viewData.formTitle = 'All online forms';
+            viewData.forms = await applicationService.getAvailableForms();
+        }
+
+        res.render(path.resolve(__dirname, 'views/dashboard'), viewData);
+    } catch (error) {
+        next(error);
+    }
 });
 
-/**
- * View helper for formatting a date
- * @param {String} dateString
- * @param {String} format
- * @see https://momentjs.com/docs/#/displaying/format/
- */
-templateEnv.addFilter('formatDate', function(dateString, format) {
-    return moment(dateString).format(format);
-});
-
-/**
- * View helper to represent date as relative time
- * @param {String} dateString
- */
-templateEnv.addFilter('timeFromNow', function(dateString) {
-    return moment(dateString).fromNow();
-});
-
-app.set('view engine', 'njk').set('engineEnv', templateEnv);
-
-dashboardRoute(app);
-
-module.exports = app;
+module.exports = router;

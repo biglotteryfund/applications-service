@@ -1,12 +1,7 @@
 'use strict';
 const express = require('express');
-const logger = require('morgan');
+const router = express.Router();
 const applicationsService = require('../../services/applications');
-
-const app = express();
-
-app.use(logger('dev'));
-app.use(express.json());
 
 function normaliseError(error) {
     let errorCode = {
@@ -30,7 +25,7 @@ function normaliseError(error) {
     return errorCode;
 }
 
-app.post('/application/add', async function(req, res) {
+router.post('/application/add', async function(req, res) {
     res.setHeader('Content-Type', 'application/vnd.api+json');
 
     try {
@@ -54,4 +49,4 @@ app.post('/application/add', async function(req, res) {
     }
 });
 
-module.exports = app;
+module.exports = router;

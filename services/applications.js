@@ -4,17 +4,17 @@ const { Op, fn } = require('sequelize');
 
 const { Application } = require('../models');
 
-function getReferenceId(prefix, applicationData) {
-    return `${prefix}-${hash
+function getReferenceId(shortCode, applicationData) {
+    return `${shortCode}-${hash
         .sha1(applicationData)
         .slice(0, 6)
         .toUpperCase()}`;
 }
 
-function storeApplication(formId, prefix, applicationData) {
+function storeApplication({ formId, shortCode, applicationData }) {
     return Application.create({
         form_id: formId,
-        reference_id: getReferenceId(prefix, applicationData),
+        reference_id: getReferenceId(shortCode, applicationData),
         application_data: applicationData
     });
 }

@@ -9,7 +9,7 @@
     "start": "node ./bin/www",
     "startDev": "DEBUG=applications-service:* nodemon ./bin/www",
     "test": "eslint .",
-    "format": "prettier --write {apps,bin,models,services}/**/* README.md"
+    "format": "prettier --single-quote --write {apps,models,services}/**/* README.md"
   },
   "prettier": {
     "singleQuote": true
@@ -21,7 +21,10 @@
     "extends": [
       "eslint:recommended",
       "plugin:node/recommended"
-    ]
+    ],
+    "rules": {
+      "node/shebang": "off"
+    }
   },
   "dependencies": {
     "body-parser": "^1.18.3",

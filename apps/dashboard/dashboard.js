@@ -1,12 +1,12 @@
 'use strict';
 const path = require('path');
+const applicationService = require('../../services/applications');
 
-module.exports = function(app) {
-    const applicationService = require('../../services/applications');
+module.exports = function (app) {
 
     app.route('/:formId?/:applicationId?').get(async (req, res, next) => {
         try {
-            const { formId, applicationId } = req.params;
+            const {formId, applicationId} = req.params;
 
             const viewData = {
                 formId,

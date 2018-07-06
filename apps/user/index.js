@@ -126,7 +126,7 @@ passport.use(
                             .then(() => {
                                 return done(null, profile);
                             })
-                            .catch(dbErr => {
+                            .catch(() => {
                                 return done(null, user);
                             });
                     }
@@ -190,7 +190,7 @@ app.post(
 );
 
 app.get('/logout', (req, res) => {
-    req.session.destroy(err => {
+    req.session.destroy(() => {
         req.logOut();
         res.redirect(config.get('auth.destroySessionUrl'));
     });

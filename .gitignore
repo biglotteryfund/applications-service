@@ -1,5 +1,10 @@
+.css.map
+.DS_Store
 .env
-node_modules/
+.idea
+.map
+.vscode/
+node_modules
 npm-debug.log*
 
 # Elastic Beanstalk Files

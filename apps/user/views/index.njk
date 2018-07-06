@@ -1,0 +1,14 @@
+{% extends "./layout.njk" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    {% if not user %}
+        <h2>Welcome! Please log in.</h2>
+        <a href="/user/login/">Log In</a>
+    {% else %}
+        <h2>Hello, {{ user.given_name }}.</h2>
+        <p><a href="/user/account">Account Info</a></p>
+        <p><a href="/user/logout">Log Out</a></p>
+    {% endif %}
+{% endblock %}

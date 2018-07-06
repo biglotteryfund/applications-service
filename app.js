@@ -10,5 +10,6 @@ const app = express();
 
 app.use('/', require('./apps/dashboard'));
 app.use('/api', require('./apps/api'));
+app.use('/user', require('./apps/user'));
 
 module.exports = app;

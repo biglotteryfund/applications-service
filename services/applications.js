@@ -38,7 +38,7 @@ function getApplicationsByForm(formId) {
     });
 }
 
-function getApplicationsById(applicationId) {
+function getApplicationById(applicationId) {
     return Application.findOne({
         where: {
             reference_id: {
@@ -52,6 +52,6 @@ module.exports = {
     getReferenceId,
     storeApplication,
     getApplicationsByForm,
-    getApplicationsById,
+    getApplicationById,
     getAvailableForms
 };

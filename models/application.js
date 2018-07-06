@@ -21,9 +21,7 @@ module.exports = function(sequelize, DataTypes) {
             getterMethods: {
                 formTitle() {
                     // via https://stackoverflow.com/questions/196972/convert-string-to-title-case-with-javascript#comment85199999_46959528
-                    return this.form_id
-                        .replace(/-/g, ' ')
-                        .replace(/\b\S/g, t => t.toUpperCase());
+                    return this.form_id.replace(/-/g, ' ').replace(/\b\S/g, t => t.toUpperCase());
                 }
             }
         }

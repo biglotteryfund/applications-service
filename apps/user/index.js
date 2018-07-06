@@ -50,7 +50,7 @@ const templateEnv = nunjucks.configure('.', {
 
 app.set('view engine', 'njk').set('engineEnv', templateEnv);
 
-const createUser = (user) => {
+const createUser = user => {
     return User.create({
         oid: user.oid,
         email: user.upn,
@@ -66,15 +66,17 @@ const findUser = (oid, cb) => {
                 [Op.eq]: oid
             }
         }
-    }).then(user => {
-        // update last login date
-        user.changed('updatedAt', true);
-        return user.save().then(() => {
-            return cb(null, user);
+    })
+        .then(user => {
+            // update last login date
+            user.changed('updatedAt', true);
+            return user.save().then(() => {
+                return cb(null, user);
+            });
+        })
+        .catch(() => {
+            return cb(null, null);
         });
-    }).catch(() => {
-        return cb(null, null);
-    });
 };
 
 passport.serializeUser((user, done) => {
@@ -120,11 +122,13 @@ passport.use(
                         return done(err);
                     }
                     if (!user) {
-                        createUser(profile).then(() => {
-                            return done(null, profile);
-                        }).catch(dbErr => {
-                            return done(null, user);
-                        });
+                        createUser(profile)
+                            .then(() => {
+                                return done(null, profile);
+                            })
+                            .catch(dbErr => {
+                                return done(null, user);
+                            });
                     }
                     return done(null, user);
                 });

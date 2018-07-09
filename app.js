@@ -31,9 +31,8 @@ const dashboard = require('./apps/dashboard');
 const user = require('./apps/user');
 const errors = require('./apps/errors');
 
-const passportMiddleware = require('./services/passport');
-const sessionMiddleware = require('./services/session');
-const bodyParserMiddleware = require('./services/bodyParser');
+const bodyParser = require('body-parser');
+const auth = require('./middleware/auth');
 
 /**
  * Configure Sentry client
@@ -95,9 +94,9 @@ initViewEngine();
  * Global middleware
  */
 app.use(logger('dev'));
-app.use(bodyParserMiddleware);
-app.use(sessionMiddleware(app));
-app.use(passportMiddleware());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(auth.globalMiddleware());
 
 /**
  * Mount routers

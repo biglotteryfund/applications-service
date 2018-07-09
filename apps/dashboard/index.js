@@ -3,8 +3,8 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 
+const auth = require('../../middleware/auth');
 const applicationService = require('../../services/applications');
-const auth = require('../../services/auth');
 
 router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (req, res, next) => {
     try {

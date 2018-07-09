@@ -35,21 +35,17 @@ function summariseApplications({ baseUrl, formId, applications }) {
 
     if (transformer) {
         return applications.map(application => {
-            const fields = flattenApplicationData(application);
             const linkUrl = `${baseUrl}/${application.reference_id}`;
+            const coreFields = {
+                'Reference ID': application.reference_id,
+                'Full application URL': {
+                    f: `=HYPERLINK("${linkUrl}", "${linkUrl}")`
+                }
+            };
 
-            const customData = transformer(fields);
+            const customFields = transformer(flattenApplicationData(application));
 
-            return Object.assign(
-                {},
-                {
-                    'Reference ID': application.reference_id,
-                    'Full application URL': {
-                        f: `=HYPERLINK("${linkUrl}", "${linkUrl}")`
-                    }
-                },
-                customData
-            );
+            return Object.assign(coreFields, customFields);
         });
     } else {
         return [];

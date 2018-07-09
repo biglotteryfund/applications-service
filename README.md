@@ -29,6 +29,7 @@ MS_COOKIE_ENC_IV_1=<12 char string>
 MS_COOKIE_ENC_KEY_2=<32 char string>
 MS_COOKIE_ENC_IV_2=<12 char string>
 SESSION_SECRET=<32 char string>
+SENTRY_DSN=<sentry dsn>
 ```
 
 ### Run the app

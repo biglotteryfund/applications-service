@@ -1,40 +1,57 @@
 'use strict';
 const config = require('config');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const passport = require('passport');
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
-const { Op } = require('sequelize');
 
 const models = require('../models');
-const User = models.User;
+const userService = require('../services/user');
 
-const createUser = (user) => {
-    return User.create({
-        oid: user.oid,
-        email: user.upn,
-        given_name: user.name.givenName,
-        family_name: user.name.familyName
-    });
-};
-
-const findUser = (oid, cb) => {
-    return User.findOne({
-        where: {
-            oid: {
-                [Op.eq]: oid
-            }
-        }
-    }).then(user => {
-        // update last login date
-        user.changed('updatedAt', true);
-        return user.save().then(() => {
-            return cb(null, user);
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    } else {
+        req.session.redirectUrl = req.originalUrl;
+        req.session.save(() => {
+            return res.redirect('/user');
         });
-    }).catch(() => {
-        return cb(null, null);
-    });
-};
+    }
+}
 
-module.exports = function() {
+function authMiddleware(req, res, next) {
+    passport.authenticate('azuread-openidconnect', {
+        response: res,
+        failureRedirect: '/user'
+    })(req, res, next);
+}
+
+function authMiddlewareLogin(req, res, next) {
+    passport.authenticate('azuread-openidconnect', {
+        response: res,
+        resourceURL: config.get('auth.resourceURL'),
+        failureRedirect: '/user'
+    })(req, res, next);
+}
+
+function globalMiddleware() {
+    const store = new SequelizeStore({
+        db: models.sequelize
+    });
+
+    // create sessions table
+    store.sync();
+
+    const secret = process.env.SESSION_SECRET;
+    const sessionConfig = {
+        name: 'blf-applications',
+        secret: secret,
+        resave: true,
+        saveUninitialized: false,
+        store: store
+    };
+
     passport.use(
         new OIDCStrategy(
             {
@@ -63,16 +80,19 @@ module.exports = function() {
                 }
                 // asynchronous verification, for effect...
                 process.nextTick(() => {
-                    findUser(profile.oid, (err, user) => {
+                    userService.findUser(profile.oid, (err, user) => {
                         if (err) {
                             return done(err);
                         }
                         if (!user) {
-                            createUser(profile).then(() => {
-                                return done(null, profile);
-                            }).catch(() => {
-                                return done(null, user);
-                            });
+                            userService
+                                .createUser(profile)
+                                .then(() => {
+                                    return done(null, profile);
+                                })
+                                .catch(() => {
+                                    return done(null, user);
+                                });
                         }
                         return done(null, user);
                     });
@@ -86,10 +106,17 @@ module.exports = function() {
     });
 
     passport.deserializeUser((oid, done) => {
-        findUser(oid, (err, user) => {
+        userService.findUser(oid, (err, user) => {
             done(err, user);
         });
     });
 
-    return [passport.initialize(), passport.session()];
+    return [cookieParser(secret), session(sessionConfig), passport.initialize(), passport.session()];
+}
+
+module.exports = {
+    ensureAuthenticated,
+    authMiddleware,
+    authMiddlewareLogin,
+    globalMiddleware
 };

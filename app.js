@@ -2,51 +2,114 @@
 const express = require('express');
 const logger = require('morgan');
 const moment = require('moment');
-
-const LAUNCH_DATE = moment();
-
-const env = process.env.NODE_ENV || 'development';
-if (env === 'development') {
-    require('dotenv').config();
-}
-const passportMiddleware = require('./services/passport');
-const sessionMiddleware = require('./services/session');
-const bodyParserMiddleware = require('./services/bodyParser');
-const viewEngine = require('./services/viewEngine');
+const nunjucks = require('nunjucks');
+const Raven = require('raven');
 
 const app = express();
 
-// Set up templating
-app.set('view engine', 'njk').set('engineEnv', viewEngine(app));
+const environment = process.env.NODE_ENV || 'development';
+const isDev = environment === 'development';
 
-// Configure middleware
-app.use(logger('dev'));
-app.use(bodyParserMiddleware);
-app.use(sessionMiddleware(app));
-app.use(passportMiddleware());
+if (environment === 'development') {
+    require('dotenv').config();
+}
 
-// Mount routes
-app.use('/dashboard', require('./apps/dashboard'));
-app.use('/api', require('./apps/api'));
-app.use('/user', require('./apps/user'));
+/**
+ * Define common app locals
+ * @see https://expressjs.com/en/api.html#app.locals
+ */
+app.locals.environment = environment;
+app.locals.DATE_FORMATS = {
+    short: 'D MMMM, YYYY',
+    full: 'dddd D MMMM YYYY',
+    fullTimestamp: 'dddd D MMM YYYY (hh:mm a)'
+};
 
-app.get('/status', (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    res.setHeader('Cache-Control', 'no-store,no-cache,max-age=0');
-    res.json({
-        START_DATE: LAUNCH_DATE.format('dddd, MMMM Do YYYY, h:mm:ss a'),
-        UPTIME: LAUNCH_DATE.toNow(true)
-    })
-});
+const api = require('./apps/api');
+const status = require('./apps/status');
+const dashboard = require('./apps/dashboard');
+const user = require('./apps/user');
+const errors = require('./apps/errors');
 
-// Handle errors
-app.use((err, req, res, next) => {
-    if (res.headersSent) {
-        return next(err);
+const bodyParser = require('body-parser');
+const auth = require('./middleware/auth');
+
+/**
+ * Configure Sentry client
+ * @see https://docs.sentry.io/clients/node/config/
+ * @see https://docs.sentry.io/clients/node/integrations/express/
+ */
+Raven.config(process.env.SENTRY_DSN, {
+    logger: 'server',
+    environment: environment,
+    autoBreadcrumbs: true,
+    dataCallback(data) {
+        // Clear installed node_modules
+        delete data.modules;
+        // Clear POST data
+        delete data.request.data;
+        return data;
     }
-    res.send({err});
-});
+}).install();
 
+app.use(Raven.requestHandler());
+
+/**
+ * Configure views
+ * - Configure Nunjucks
+ * - Add custom filters
+ */
+function initViewEngine() {
+    const templateEnv = nunjucks.configure('.', {
+        autoescape: true,
+        express: app,
+        noCache: isDev === true,
+        watch: isDev  === true
+    });
+
+    /**
+     * View helper for formatting a date
+     * @param {String} dateString
+     * @param {String} format
+     * @see https://momentjs.com/docs/#/displaying/format/
+     */
+    templateEnv.addFilter('formatDate', function(dateString, format) {
+        return moment(dateString).format(format);
+    });
+
+    /**
+     * View helper to represent date as relative time
+     * @param {String} dateString
+     */
+    templateEnv.addFilter('timeFromNow', function(dateString) {
+        return moment(dateString).fromNow();
+    });
+
+    app.set('view engine', 'njk').set('engineEnv', templateEnv);
+}
+
+initViewEngine();
+
+/**
+ * Global middleware
+ */
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(auth.globalMiddleware());
+
+/**
+ * Mount routers
+ */
+app.use('/api', api);
+app.get('/status', status);
+app.use('/dashboard', dashboard);
+app.use('/user', user);
+
+/**
+ * Global error handlers
+ */
+app.use(Raven.errorHandler());
+app.use(errors.onError);
 
 module.exports = app;

@@ -13,7 +13,7 @@ module.exports = function() {
     // create sessions table
     store.sync();
 
-    const secret = 'keyboard cat';
+    const secret = process.env.SESSION_SECRET;
     const sessionConfig = {
         name: 'blf-applications',
         secret: secret,

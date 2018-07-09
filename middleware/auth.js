@@ -85,11 +85,14 @@ function globalMiddleware() {
                             return done(err);
                         }
                         if (!user) {
-                            userService.createUser(profile).then(() => {
-                                return done(null, profile);
-                            }).catch(() => {
-                                return done(null, user);
-                            });
+                            userService
+                                .createUser(profile)
+                                .then(() => {
+                                    return done(null, profile);
+                                })
+                                .catch(() => {
+                                    return done(null, user);
+                                });
                         }
                         return done(null, user);
                     });

@@ -17,7 +17,7 @@ function mockUser() {
             givenName: firstName,
             familyName: lastName
         }
-    }
+    };
 }
 
 beforeAll(async function() {

@@ -37,9 +37,8 @@ function summariseApplications({ baseUrl, formId, applications }) {
         return applications.map(application => {
             const linkUrl = `${baseUrl}/${application.reference_id}`;
             const coreFields = {
-                'Reference ID': application.reference_id,
-                'Full application URL': {
-                    f: `=HYPERLINK("${linkUrl}", "${linkUrl}")`
+                'Reference ID': {
+                    f: `=HYPERLINK("${linkUrl}", "${application.reference_id}")`
                 }
             };
 

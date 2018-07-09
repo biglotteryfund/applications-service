@@ -3,10 +3,8 @@
 {% block title %}{% if applicationData %}Application {{ applicationData.reference_id }} | {{ formTitle }}{% else %}{{ formTitle }} | All applications{% endif %}{% endblock %}
 
 {% macro renderPagination() %}
-    <h6 class="text-center">Select a page (or <a href="?perPage=all">view all?</a>):</h6>
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
-
             {# first / prev #}
             <li class="page-item{% if pagination.currentPage <= 1%} disabled{% endif %}">
                 <a class="page-link"
@@ -140,12 +138,16 @@
             {% endfor %}
         </div>
     {% elseif applications.length > 0 %}
-        <h2>
+        <h2 class="mb-4">
             All applications
-            <small>({{ totalApplications }} total / showing {{ pagination.perPage }} per page)</small>
+            {% if showDownloadLink %}
+                <a class="btn btn-primary btn-sm" href="?download=1">Download as Excel file</a>
+            {% endif %}
         </h2>
-        <p>Click an application below to view all its data.</p>
-        {# <a class="btn btn-primary mb-3" href="?download=1">Download as Excel file</a> #}
+        <p>
+            Showing {{ totalApplications }} total / {{ pagination.perPage }} per page
+            (<a href="?perPage=all">view all</a>)
+        </p>
 
         {{ renderPagination() }}
 

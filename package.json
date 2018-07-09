@@ -51,7 +51,8 @@
     "passport": "^0.4.0",
     "passport-azure-ad": "^3.0.12",
     "raven": "^2.6.3",
-    "sequelize": "^4.38.0"
+    "sequelize": "^4.38.0",
+    "xlsx": "^0.13.2"
   },
   "devDependencies": {
     "eslint": "^5.0.1",

@@ -39,14 +39,18 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
             viewData.formTitle = viewData.applicationData.formTitle;
         } else if (formId) {
             // get applications for a given form
-            const paginatedApplications = await applicationService.getApplicationsByForm(formId, recordsPerPage, currentPage);
+            const paginatedApplications = await applicationService.getApplicationsByForm(
+                formId,
+                recordsPerPage,
+                currentPage
+            );
             viewData.applications = paginatedApplications.applications;
             viewData.totalApplications = paginatedApplications.totalApplications;
 
             viewData.pagination = {
                 currentPage: currentPage,
                 perPage: recordsPerPage,
-                totalPages: paginatedApplications.numPages,
+                totalPages: paginatedApplications.numPages
             };
 
             if (viewData.applications.length < 1) {
@@ -58,11 +62,17 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
             /**
              * Allow people to download a summary spreadheet of all application
              */
-            if (req.query.download) {
-                const summary = summariseApplications({
-                    baseUrl: getCleanAbsoluteUrl(req),
-                    applications: viewData.applications
-                });
+            const summary = summariseApplications({
+                baseUrl: getCleanAbsoluteUrl(req),
+                formId: formId,
+                applications: viewData.applications
+            });
+
+            console.log({ summary });
+
+            viewData.showDownloadLink = summary.length > 0;
+
+            if (viewData.showDownloadLink && req.query.download) {
                 const buffer = createSpreadsheet(summary);
                 res.setHeader('Content-Disposition', `attachment; filename=${formId}.xlsx`);
                 return res.status(200).send(buffer);

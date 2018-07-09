@@ -140,7 +140,9 @@
     {% elseif applications.length > 0 %}
         <h2 class="mb-4">
             All applications
-            <a class="btn btn-primary btn-sm" href="?download=1">Download as Excel file</a>
+            {% if showDownloadLink %}
+                <a class="btn btn-primary btn-sm" href="?download=1">Download as Excel file</a>
+            {% endif %}
         </h2>
         <p>
             Showing {{ totalApplications }} total / {{ pagination.perPage }} per page

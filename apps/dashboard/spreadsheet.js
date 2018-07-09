@@ -12,21 +12,48 @@ function flattenApplicationData(application) {
     );
 }
 
-function summariseApplications({ baseUrl, applications }) {
-    return applications.map(application => {
-        const fields = flattenApplicationData(application);
+function getTransformer(formId) {
+    switch (formId) {
+        case 'building-connections-fund':
+            return function(fields) {
+                return {
+                    'Project location': fields['location'],
+                    'Organisation Name': fields['organisation-name'],
+                    'Address: Street': fields['address-building-street'],
+                    'Address: Town or City': fields['address-town-city'],
+                    'Address: County': fields['address-county'],
+                    'Address: Postcode': fields['address-postcode']
+                };
+            };
+        default:
+            return null;
+    }
+}
 
-        return {
-            'Reference ID': application.form_id,
-            'Full application URL': `${baseUrl}/${application.reference_id}`,
-            'Project location': fields['location'],
-            'Organisation Name': fields['organisation-name'],
-            'Address: Street': fields['address-building-street'],
-            'Address: Town or City': fields['address-town-city'],
-            'Address: County': fields['address-county'],
-            'Address: Postcode': fields['address-postcode']
-        };
-    });
+function summariseApplications({ baseUrl, formId, applications }) {
+    const transformer = getTransformer(formId);
+
+    if (transformer) {
+        return applications.map(application => {
+            const fields = flattenApplicationData(application);
+            const linkUrl = `${baseUrl}/${application.reference_id}`;
+
+            const customData = transformer(fields);
+
+            return Object.assign(
+                {},
+                {
+                    'Reference ID': application.reference_id,
+                    'Full application URL': {
+                        f: `=HYPERLINK("${linkUrl}", "${linkUrl}")`
+                    }
+                },
+                customData
+            );
+        });
+    } else {
+        return [];
+    }
 }
 
 /**

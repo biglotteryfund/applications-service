@@ -67,8 +67,8 @@ test('should get all available forms', async function() {
 });
 
 test('should get all applications for a given form', async function() {
-    const applications = await applicationsService.getApplicationsByForm('test-form-1');
-    expect(applications).toHaveLength(1);
+    const response = await applicationsService.getApplicationsByForm('test-form-1', );
+    expect(response.applications).toHaveLength(1);
 });
 
 test('should get an application by its id', async function() {

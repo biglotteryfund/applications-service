@@ -27,7 +27,7 @@ function getAvailableForms() {
     });
 }
 
-function getApplicationsByForm(formId, recordsPerPage, currentPage = 1) {
+function getApplicationsByForm(formId, recordsPerPage = 50, currentPage = 1) {
     return Application.findAndCountAll().then(applications => {
         let pages = Math.ceil(applications.count / recordsPerPage);
         let query = {

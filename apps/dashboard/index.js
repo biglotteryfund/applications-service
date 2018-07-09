@@ -38,20 +38,25 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
 
             viewData.formTitle = viewData.applicationData.formTitle;
         } else if (formId) {
-            // get applications for a given form
-            const paginatedApplications = await applicationService.getPaginatedApplicationsByForm(
-                formId,
-                recordsPerPage,
-                currentPage
-            );
-            viewData.applications = paginatedApplications.applications;
-            viewData.totalApplications = paginatedApplications.totalApplications;
 
-            viewData.pagination = {
-                currentPage: currentPage,
-                perPage: recordsPerPage,
-                totalPages: paginatedApplications.numPages
-            };
+            if (recordsPerPage === 'all') {
+                viewData.applications = await applicationService.getAllApplicationsByForm(formId);
+            } else {
+                // get applications for a given form
+                const paginatedApplications = await applicationService.getPaginatedApplicationsByForm(
+                    formId,
+                    recordsPerPage,
+                    currentPage
+                );
+                viewData.applications = paginatedApplications.applications;
+                viewData.totalApplications = paginatedApplications.totalApplications;
+
+                viewData.pagination = {
+                    currentPage: currentPage,
+                    perPage: recordsPerPage,
+                    totalPages: paginatedApplications.numPages
+                };
+            }
 
             if (viewData.applications.length < 1) {
                 return next();
@@ -60,7 +65,7 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
             viewData.formTitle = viewData.applications[0].formTitle;
 
             /**
-             * Allow people to download a summary spreadheet of all application
+             * Allow people to download a summary spreadsheet of all application
              */
             viewData.showDownloadLink = canDownload(formId);
             if (viewData.showDownloadLink && req.query.download) {

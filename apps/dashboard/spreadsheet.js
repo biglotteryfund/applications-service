@@ -52,6 +52,11 @@ function summariseApplications({ baseUrl, formId, applications }) {
     }
 }
 
+function canDownload(formId) {
+    const transformer = getTransformer(formId);
+    return transformer !== null;
+}
+
 /**
  * Create spreadsheet
  *
@@ -72,5 +77,6 @@ function createSpreadsheet(rows) {
 
 module.exports = {
     summariseApplications,
+    canDownload,
     createSpreadsheet
 };

@@ -5,7 +5,7 @@ const path = require('path');
 
 const auth = require('../../middleware/auth');
 const applicationService = require('../../services/applications');
-const { summariseApplications, createSpreadsheet } = require('./spreadsheet');
+const { summariseApplications, canDownload, createSpreadsheet } = require('./spreadsheet');
 
 function getCleanAbsoluteUrl(req) {
     const headerProtocol = req.get('X-Forwarded-Proto');
@@ -62,17 +62,15 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
             /**
              * Allow people to download a summary spreadheet of all application
              */
-            const summary = summariseApplications({
-                baseUrl: getCleanAbsoluteUrl(req),
-                formId: formId,
-                applications: viewData.applications
-            });
-
-            console.log({ summary });
-
-            viewData.showDownloadLink = summary.length > 0;
-
+            viewData.showDownloadLink = canDownload(formId);
             if (viewData.showDownloadLink && req.query.download) {
+                const allApplications = await applicationService.getApplicationsByForm(formId, 'all');
+                const summary = summariseApplications({
+                    baseUrl: getCleanAbsoluteUrl(req),
+                    formId: formId,
+                    applications: allApplications.applications
+                });
+
                 const buffer = createSpreadsheet(summary);
                 res.setHeader('Content-Disposition', `attachment; filename=${formId}.xlsx`);
                 return res.status(200).send(buffer);

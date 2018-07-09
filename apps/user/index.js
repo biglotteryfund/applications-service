@@ -4,7 +4,7 @@ const path = require('path');
 const config = require('config');
 const router = express.Router();
 
-const auth = require('../../services/auth');
+const auth = require('../../middleware/auth');
 
 router.get('/', (req, res) => {
     // send the logged-in user to the place they wanted to get to

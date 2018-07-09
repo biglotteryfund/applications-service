@@ -1,7 +1,7 @@
 'use strict';
 const express = require('express');
 const logger = require('morgan');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const nunjucks = require('nunjucks');
 const Raven = require('raven');
 
@@ -74,7 +74,7 @@ function initViewEngine() {
      * @see https://momentjs.com/docs/#/displaying/format/
      */
     templateEnv.addFilter('formatDate', function(dateString, format) {
-        return moment(dateString).format(format);
+        return moment(dateString).tz("Europe/London").format(format);
     });
 
     /**
@@ -82,7 +82,7 @@ function initViewEngine() {
      * @param {String} dateString
      */
     templateEnv.addFilter('timeFromNow', function(dateString) {
-        return moment(dateString).fromNow();
+        return moment(dateString).tz("Europe/London").fromNow();
     });
 
     app.set('view engine', 'njk').set('engineEnv', templateEnv);

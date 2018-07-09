@@ -3,7 +3,7 @@
 {% block title %}{% if applicationData %}Application {{ applicationData.reference_id }} | {{ formTitle }}{% else %}{{ formTitle }} | All applications{% endif %}{% endblock %}
 
 {% macro renderPagination() %}
-    {% if pagination %}
+    {% if pagination and pagination.totalPages > 1 %}
         <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-center">
                 {# first / prev #}

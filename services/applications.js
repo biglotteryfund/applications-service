@@ -28,15 +28,18 @@ function getAvailableForms() {
 }
 
 function getApplicationsByForm(formId, recordsPerPage = 50, currentPage = 1) {
-    return Application.findAndCountAll().then(applications => {
+    const whereClause = {
+        form_id: {
+            [Op.eq]: formId
+        }
+    };
+    return Application.findAndCountAll({
+        where: whereClause
+    }).then(applications => {
         let pages = Math.ceil(applications.count / recordsPerPage);
         let query = {
             order: [['updatedAt', 'DESC']],
-            where: {
-                form_id: {
-                    [Op.eq]: formId
-                }
-            }
+            where: whereClause
         };
 
         if (recordsPerPage !== 'all') {

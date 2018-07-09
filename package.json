@@ -9,7 +9,7 @@
     "start": "node ./bin/www",
     "startDev": "DEBUG=applications-service:* nodemon ./bin/www",
     "test": "eslint . && jest .",
-    "format": "prettier --single-quote --write {apps,models,services}/**/* README.md"
+    "format": "prettier --single-quote --write {apps,middleware,models,services}/**/*.js README.md"
   },
   "prettier": {
     "singleQuote": true

@@ -2,37 +2,7 @@
 const config = require('config');
 const passport = require('passport');
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
-const { Op } = require('sequelize');
-
-const models = require('../models');
-const User = models.User;
-
-const createUser = (user) => {
-    return User.create({
-        oid: user.oid,
-        email: user.upn,
-        given_name: user.name.givenName,
-        family_name: user.name.familyName
-    });
-};
-
-const findUser = (oid, cb) => {
-    return User.findOne({
-        where: {
-            oid: {
-                [Op.eq]: oid
-            }
-        }
-    }).then(user => {
-        // update last login date
-        user.changed('updatedAt', true);
-        return user.save().then(() => {
-            return cb(null, user);
-        });
-    }).catch(() => {
-        return cb(null, null);
-    });
-};
+const userService = require('./user');
 
 module.exports = function() {
     passport.use(
@@ -63,12 +33,12 @@ module.exports = function() {
                 }
                 // asynchronous verification, for effect...
                 process.nextTick(() => {
-                    findUser(profile.oid, (err, user) => {
+                    userService.findUser(profile.oid, (err, user) => {
                         if (err) {
                             return done(err);
                         }
                         if (!user) {
-                            createUser(profile).then(() => {
+                            userService.createUser(profile).then(() => {
                                 return done(null, profile);
                             }).catch(() => {
                                 return done(null, user);
@@ -86,7 +56,7 @@ module.exports = function() {
     });
 
     passport.deserializeUser((oid, done) => {
-        findUser(oid, (err, user) => {
+        userService.findUser(oid, (err, user) => {
             done(err, user);
         });
     });

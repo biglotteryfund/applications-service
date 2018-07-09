@@ -4,10 +4,13 @@
 
 {% block content %}
     {% if not user %}
-        <h2>Welcome! Please log in.</h2>
-        <a href="/user/login{% if redirectUrl %}?redirectUrl={{ redirectUrl }}{% endif %}">Log In</a>
+        <h1>Welcome</h1>
+        <a class="btn btn-primary"
+            href="/user/login{% if redirectUrl %}?redirectUrl={{ redirectUrl }}{% endif %}">
+            Please log in
+        </a>
     {% else %}
-        <h2>Hello, {{ user.given_name }}.</h2>
+        <h1>Hello, {{ user.given_name }}.</h1>
         <p><a href="/user/account">Account Info</a></p>
         <p><a href="/user/logout">Log Out</a></p>
     {% endif %}

@@ -1,0 +1,22 @@
+{% extends "apps/common/layout.njk" %}
+
+{% block content %}
+    <main role="main">
+        <h1>Error</h1>
+
+        <p>We're sorry, we are unable to show you this page at the moment.</p>
+
+        {% if sentry %}
+            <h2>Error ID:</h2>
+            <p><code>{{ sentry }}</code></p>
+        {% endif %}
+
+        {% if error and environment !== 'production' %}
+            <h3>Stack trace:</h3>
+            <pre><code>{{ error.stack }}</code></pre>
+            <h4>Raw error:</h4>
+            <pre><code>{{ error | dump(2) }}</code></pre>
+        {% endif %}
+    </main>
+
+{% endblock %}

@@ -1,4 +1,5 @@
 /* eslint-env jest */
+'use strict';
 process.env.DB_CONNECTION_URI = 'sqlite://:memory';
 
 const models = require('../../models');

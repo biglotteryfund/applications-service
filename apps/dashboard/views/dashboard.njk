@@ -1,4 +1,4 @@
-{% extends "./layout.njk" %}
+{% extends "apps/common/layout.njk" %}
 
 {% block title %}{% if applicationData %}Application {{ applicationData.reference_id }} | {{ formTitle }}{% else %}{{ formTitle }} | All applications{% endif %}{% endblock %}
 

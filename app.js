@@ -102,7 +102,7 @@ app.use(auth.globalMiddleware());
  * Mount routers
  */
 app.use('/api', api);
-app.get('/status', status);
+app.use('/status', status);
 app.use('/dashboard', dashboard);
 app.use('/user', user);
 

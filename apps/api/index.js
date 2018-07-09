@@ -1,7 +1,10 @@
 'use strict';
+const { isEmpty } = require('lodash');
 const express = require('express');
-const router = express.Router();
+
 const applicationsService = require('../../services/applications');
+
+const router = express.Router();
 
 function normaliseError(error) {
     let errorCode = {
@@ -18,6 +21,13 @@ function normaliseError(error) {
                 title: 'Validation error'
             };
             break;
+        case 'EmptyApplicationData':
+            errorCode = {
+                status: 400,
+                code: 'APPLICATION-003',
+                title: 'No application data'
+            }
+            break;
         default:
             break;
     }
@@ -25,10 +35,15 @@ function normaliseError(error) {
     return errorCode;
 }
 
+
 router.post('/application/add', async function(req, res) {
     res.setHeader('Content-Type', 'application/vnd.api+json');
 
     try {
+        if (isEmpty(req.body.applicationData)) {
+            throw new Error('EmptyApplicationData');
+        }
+
         const record = await applicationsService.storeApplication({
             formId: req.body.formId,
             shortCode: req.body.shortCode,

@@ -27,14 +27,31 @@ function getAvailableForms() {
     });
 }
 
-function getApplicationsByForm(formId) {
-    return Application.findAll({
-        order: [['updatedAt', 'DESC']],
-        where: {
-            form_id: {
-                [Op.eq]: formId
+function getApplicationsByForm(formId, recordsPerPage, currentPage = 1) {
+    return Application.findAndCountAll().then(applications => {
+        let pages = Math.ceil(applications.count / recordsPerPage);
+        let query = {
+            order: [['updatedAt', 'DESC']],
+            where: {
+                form_id: {
+                    [Op.eq]: formId
+                }
             }
+        };
+
+        if (recordsPerPage !== 'all') {
+            recordsPerPage = parseInt(recordsPerPage);
+            query.offset = recordsPerPage * (currentPage - 1);
+            query.limit = recordsPerPage;
         }
+
+        return Application.findAll(query).then(applicationPage => {
+            return {
+                applications: applicationPage,
+                numPages: pages,
+                totalApplications: applications.count
+            }
+        });
     });
 }
 

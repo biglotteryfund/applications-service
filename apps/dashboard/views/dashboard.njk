@@ -2,6 +2,84 @@
 
 {% block title %}{% if applicationData %}Application {{ applicationData.reference_id }} | {{ formTitle }}{% else %}{{ formTitle }} | All applications{% endif %}{% endblock %}
 
+{% macro renderPagination() %}
+    <h6 class="text-center">Select a page (or <a href="?perPage=all">view all?</a>):</h6>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+
+            {# first / prev #}
+            <li class="page-item{% if pagination.currentPage <= 1%} disabled{% endif %}">
+                <a class="page-link"
+                   href="?perPage={{ pagination.perPage }}&page=1">
+                    << First
+                </a>
+            </li>
+            <li class="page-item{% if pagination.currentPage <= 1%} disabled{% endif %}">
+                <a class="page-link"
+                   href="?perPage={{ pagination.perPage }}&page={{ pagination.currentPage - 1 }}">
+                    < Previous
+                </a>
+            </li>
+
+            {# preceding pages #}
+            {% if pagination.currentPage > 1 and pagination.currentPage < pagination.totalPages %}
+                {% if pagination.currentPage === pagination.totalPages - 1 %}
+                    {% set startPage = pagination.currentPage - 1 %}
+                    {% set endPage = pagination.currentPage %}
+                {% elseif pagination.currentPage === 2 %}
+                    {% set startPage = 1 %}
+                    {% set endPage = 2 %}
+                {% else %}
+                    {% set startPage = pagination.currentPage - 2 %}
+                    {% set endPage = pagination.currentPage %}
+                {% endif %}
+                {% for i in range(startPage, endPage) -%}
+                    <li class="page-item">
+                        <a class="page-link" href="?perPage={{ pagination.perPage }}&page={{ i }}">{{ i }}</a>
+                    </li>
+                {%- endfor %}
+            {% endif %}
+
+            {# current page #}
+            <li class="page-item active">
+                <a class="page-link" href="#">
+                    {{ pagination.currentPage }} <span class="sr-only">(current)</span>
+                </a>
+            </li>
+
+            {# subsequent pages #}
+            {% if pagination.currentPage !== 1 and pagination.currentPage < pagination.totalPages %}
+                {% if pagination.currentPage === pagination.totalPages - 1 or pagination.currentPage === 2 %}
+                    {% set startPage = pagination.currentPage + 1 %}
+                    {% set endPage = pagination.currentPage + 2 %}
+                {% else %}
+                    {% set startPage = pagination.currentPage + 1 %}
+                    {% set endPage = pagination.currentPage + 3 %}
+                {% endif %}
+                {% for i in range(startPage, endPage) -%}
+                    <li class="page-item">
+                        <a class="page-link" href="?perPage={{ pagination.perPage }}&page={{ i }}">{{ i }}</a>
+                    </li>
+                {%- endfor %}
+            {% endif %}
+
+            {# next / last #}
+            <li class="page-item{% if pagination.currentPage === pagination.totalPages %} disabled{% endif %}">
+                <a class="page-link"
+                   href="?perPage={{ pagination.perPage }}&page={{ pagination.currentPage + 1 }}">
+                    Next >
+                </a>
+            </li>
+            <li class="page-item{% if pagination.currentPage === pagination.totalPages %} disabled{% endif %}">
+                <a class="page-link"
+                   href="?perPage={{ pagination.perPage }}&page={{ pagination.totalPages }}">
+                    Last >>
+                </a>
+            </li>
+        </ul>
+    </nav>
+{% endmacro %}
+
 {% block content %}
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -61,9 +139,15 @@
             {% endfor %}
         </div>
     {% elseif applications.length > 0 %}
-        <h2>All applications ({{ applications.length }})</h2>
+        <h2>
+            All applications
+            <small>({{ totalApplications }} total / showing {{ pagination.perPage }} per page)</small>
+        </h2>
         <p>Click an application below to view all its data.</p>
         {# <a class="btn btn-primary mb-3" href="?download=1">Download as Excel file</a> #}
+
+        {{ renderPagination() }}
+
         <div class="border mb-5">
             <div class="list-group">
                 {% for application in applications %}
@@ -80,6 +164,8 @@
                 {% endfor %}
             </div>
         </div>
+
+        {{ renderPagination() }}
     {% else %}
         <p>No results</p>
     {% endif %}

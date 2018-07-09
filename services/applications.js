@@ -27,35 +27,28 @@ function getAvailableForms() {
     });
 }
 
-function getApplicationsByForm(formId, recordsPerPage = 50, currentPage = 1) {
-    const whereClause = {
-        form_id: {
-            [Op.eq]: formId
-        }
-    };
-    return Application.findAndCountAll({
-        where: whereClause
-    }).then(applications => {
-        let pages = Math.ceil(applications.count / recordsPerPage);
-        let query = {
-            order: [['updatedAt', 'DESC']],
-            where: whereClause
-        };
+async function getAllApplicationsByForm(formId) {
+    return Application.findAll({
+        order: [['updatedAt', 'DESC']],
+        where: { form_id: { [Op.eq]: formId } }
+    })
+}
 
-        if (recordsPerPage !== 'all') {
-            recordsPerPage = parseInt(recordsPerPage);
-            query.offset = recordsPerPage * (currentPage - 1);
-            query.limit = recordsPerPage;
-        }
+async function getPaginatedApplicationsByForm(formId, recordsPerPage = 50, currentPage = 1) {
+    recordsPerPage = parseInt(recordsPerPage);
 
-        return Application.findAll(query).then(applicationPage => {
-            return {
-                applications: applicationPage,
-                numPages: pages,
-                totalApplications: applications.count
-            }
-        });
+    const results = await Application.findAndCountAll({
+        order: [['updatedAt', 'DESC']],
+        where: { form_id: { [Op.eq]: formId } },
+        offset: recordsPerPage * (currentPage - 1),
+        limit: recordsPerPage
     });
+
+    return {
+        applications: results.rows,
+        numPages: Math.ceil(results.count / recordsPerPage),
+        totalApplications: results.count
+    };
 }
 
 function getApplicationById(applicationId) {
@@ -69,9 +62,10 @@ function getApplicationById(applicationId) {
 }
 
 module.exports = {
+    getAllApplicationsByForm,
+    getApplicationById,
+    getAvailableForms,
+    getPaginatedApplicationsByForm,
     getReferenceId,
     storeApplication,
-    getApplicationsByForm,
-    getApplicationById,
-    getAvailableForms
 };

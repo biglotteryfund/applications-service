@@ -39,7 +39,7 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
             viewData.formTitle = viewData.applicationData.formTitle;
         } else if (formId) {
             // get applications for a given form
-            const paginatedApplications = await applicationService.getApplicationsByForm(
+            const paginatedApplications = await applicationService.getPaginatedApplicationsByForm(
                 formId,
                 recordsPerPage,
                 currentPage
@@ -64,11 +64,11 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
              */
             viewData.showDownloadLink = canDownload(formId);
             if (viewData.showDownloadLink && req.query.download) {
-                const allApplications = await applicationService.getApplicationsByForm(formId, 'all');
+                const allApplications = await applicationService.getAllApplicationsByForm(formId);
                 const summary = summariseApplications({
-                    baseUrl: getCleanAbsoluteUrl(req),
                     formId: formId,
-                    applications: allApplications.applications
+                    baseUrl: getCleanAbsoluteUrl(req),
+                    applications: allApplications
                 });
 
                 const buffer = createSpreadsheet(summary);

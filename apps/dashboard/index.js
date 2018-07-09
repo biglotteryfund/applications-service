@@ -10,6 +10,9 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
     try {
         const { formId, applicationId } = req.params;
 
+        const recordsPerPage = req.query.perPage || 50;
+        const currentPage = parseInt(req.query.page) || 1;
+
         const viewData = {
             formId,
             forms: [],
@@ -29,7 +32,15 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
             viewData.formTitle = viewData.applicationData.formTitle;
         } else if (formId) {
             // get applications for a given form
-            viewData.applications = await applicationService.getApplicationsByForm(formId);
+            const paginatedApplications = await applicationService.getApplicationsByForm(formId, recordsPerPage, currentPage);
+            viewData.applications = paginatedApplications.applications;
+            viewData.totalApplications = paginatedApplications.totalApplications;
+
+            viewData.pagination = {
+                currentPage: currentPage,
+                perPage: recordsPerPage,
+                totalPages: paginatedApplications.numPages,
+            };
 
             if (viewData.applications.length < 1) {
                 return next();

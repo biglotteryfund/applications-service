@@ -3,79 +3,81 @@
 {% block title %}{% if applicationData %}Application {{ applicationData.reference_id }} | {{ formTitle }}{% else %}{{ formTitle }} | All applications{% endif %}{% endblock %}
 
 {% macro renderPagination() %}
-    <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-center">
-            {# first / prev #}
-            <li class="page-item{% if pagination.currentPage <= 1%} disabled{% endif %}">
-                <a class="page-link"
-                   href="?perPage={{ pagination.perPage }}&page=1">
-                    << First
-                </a>
-            </li>
-            <li class="page-item{% if pagination.currentPage <= 1%} disabled{% endif %}">
-                <a class="page-link"
-                   href="?perPage={{ pagination.perPage }}&page={{ pagination.currentPage - 1 }}">
-                    < Previous
-                </a>
-            </li>
+    {% if pagination %}
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                {# first / prev #}
+                <li class="page-item{% if pagination.currentPage <= 1%} disabled{% endif %}">
+                    <a class="page-link"
+                       href="?perPage={{ pagination.perPage }}&page=1">
+                        << First
+                    </a>
+                </li>
+                <li class="page-item{% if pagination.currentPage <= 1%} disabled{% endif %}">
+                    <a class="page-link"
+                       href="?perPage={{ pagination.perPage }}&page={{ pagination.currentPage - 1 }}">
+                        < Previous
+                    </a>
+                </li>
 
-            {# preceding pages #}
-            {% if pagination.currentPage > 1 and pagination.currentPage < pagination.totalPages %}
-                {% if pagination.currentPage === pagination.totalPages - 1 %}
-                    {% set startPage = pagination.currentPage - 1 %}
-                    {% set endPage = pagination.currentPage %}
-                {% elseif pagination.currentPage === 2 %}
-                    {% set startPage = 1 %}
-                    {% set endPage = 2 %}
-                {% else %}
-                    {% set startPage = pagination.currentPage - 2 %}
-                    {% set endPage = pagination.currentPage %}
+                {# preceding pages #}
+                {% if pagination.currentPage > 1 and pagination.currentPage < pagination.totalPages %}
+                    {% if pagination.currentPage === pagination.totalPages - 1 %}
+                        {% set startPage = pagination.currentPage - 1 %}
+                        {% set endPage = pagination.currentPage %}
+                    {% elseif pagination.currentPage === 2 %}
+                        {% set startPage = 1 %}
+                        {% set endPage = 2 %}
+                    {% else %}
+                        {% set startPage = pagination.currentPage - 2 %}
+                        {% set endPage = pagination.currentPage %}
+                    {% endif %}
+                    {% for i in range(startPage, endPage) -%}
+                        <li class="page-item">
+                            <a class="page-link" href="?perPage={{ pagination.perPage }}&page={{ i }}">{{ i }}</a>
+                        </li>
+                    {%- endfor %}
                 {% endif %}
-                {% for i in range(startPage, endPage) -%}
-                    <li class="page-item">
-                        <a class="page-link" href="?perPage={{ pagination.perPage }}&page={{ i }}">{{ i }}</a>
-                    </li>
-                {%- endfor %}
-            {% endif %}
 
-            {# current page #}
-            <li class="page-item active">
-                <span class="page-link">
-                    {{ pagination.currentPage }}
-                </span>
-            </li>
+                {# current page #}
+                <li class="page-item active">
+                    <span class="page-link">
+                        {{ pagination.currentPage }}
+                    </span>
+                </li>
 
-            {# subsequent pages #}
-            {% if pagination.currentPage !== 1 and pagination.currentPage < pagination.totalPages %}
-                {% if pagination.currentPage === pagination.totalPages - 1 or pagination.currentPage === 2 %}
-                    {% set startPage = pagination.currentPage + 1 %}
-                    {% set endPage = pagination.currentPage + 2 %}
-                {% else %}
-                    {% set startPage = pagination.currentPage + 1 %}
-                    {% set endPage = pagination.currentPage + 3 %}
+                {# subsequent pages #}
+                {% if pagination.currentPage !== 1 and pagination.currentPage < pagination.totalPages %}
+                    {% if pagination.currentPage === pagination.totalPages - 1 or pagination.currentPage === 2 %}
+                        {% set startPage = pagination.currentPage + 1 %}
+                        {% set endPage = pagination.currentPage + 2 %}
+                    {% else %}
+                        {% set startPage = pagination.currentPage + 1 %}
+                        {% set endPage = pagination.currentPage + 3 %}
+                    {% endif %}
+                    {% for i in range(startPage, endPage) -%}
+                        <li class="page-item">
+                            <a class="page-link" href="?perPage={{ pagination.perPage }}&page={{ i }}">{{ i }}</a>
+                        </li>
+                    {%- endfor %}
                 {% endif %}
-                {% for i in range(startPage, endPage) -%}
-                    <li class="page-item">
-                        <a class="page-link" href="?perPage={{ pagination.perPage }}&page={{ i }}">{{ i }}</a>
-                    </li>
-                {%- endfor %}
-            {% endif %}
 
-            {# next / last #}
-            <li class="page-item{% if pagination.currentPage === pagination.totalPages %} disabled{% endif %}">
-                <a class="page-link"
-                   href="?perPage={{ pagination.perPage }}&page={{ pagination.currentPage + 1 }}">
-                    Next >
-                </a>
-            </li>
-            <li class="page-item{% if pagination.currentPage === pagination.totalPages %} disabled{% endif %}">
-                <a class="page-link"
-                   href="?perPage={{ pagination.perPage }}&page={{ pagination.totalPages }}">
-                    Last >>
-                </a>
-            </li>
-        </ul>
-    </nav>
+                {# next / last #}
+                <li class="page-item{% if pagination.currentPage === pagination.totalPages %} disabled{% endif %}">
+                    <a class="page-link"
+                       href="?perPage={{ pagination.perPage }}&page={{ pagination.currentPage + 1 }}">
+                        Next >
+                    </a>
+                </li>
+                <li class="page-item{% if pagination.currentPage === pagination.totalPages %} disabled{% endif %}">
+                    <a class="page-link"
+                       href="?perPage={{ pagination.perPage }}&page={{ pagination.totalPages }}">
+                        Last >>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
 {% endmacro %}
 
 {% block content %}

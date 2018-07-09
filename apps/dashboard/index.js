@@ -5,6 +5,13 @@ const path = require('path');
 
 const auth = require('../../middleware/auth');
 const applicationService = require('../../services/applications');
+const { summariseApplications, createSpreadsheet } = require('./spreadsheet');
+
+function getCleanAbsoluteUrl(req) {
+    const headerProtocol = req.get('X-Forwarded-Proto');
+    const protocol = headerProtocol ? headerProtocol : req.protocol;
+    return `${protocol}://${req.get('host')}${req.baseUrl}${req.path}`;
+}
 
 router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (req, res, next) => {
     try {
@@ -47,6 +54,19 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
             }
 
             viewData.formTitle = viewData.applications[0].formTitle;
+
+            /**
+             * Allow people to download a summary spreadheet of all application
+             */
+            if (req.query.download) {
+                const summary = summariseApplications({
+                    baseUrl: getCleanAbsoluteUrl(req),
+                    applications: viewData.applications
+                });
+                const buffer = createSpreadsheet(summary);
+                res.setHeader('Content-Disposition', `attachment; filename=${formId}.xlsx`);
+                return res.status(200).send(buffer);
+            }
         } else {
             // fetch all forms instead for a list
             viewData.formTitle = 'All online forms';

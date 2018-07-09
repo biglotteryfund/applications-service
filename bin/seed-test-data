@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+'use strict';
+const request = require('request');
+
+let application = [{"version": "", "name": "Your current work", "fieldsets": [{"fields": [{"name": "current-work", "label": "How is your current work committed to helping to prevent or reduce loneliness?", "value": "ergr"}], "legend": "Your current work"}]}, {"name": "Your project idea", "fieldsets": [{"fields": [{"name": "project-name", "label": "What is the name of your project?", "value": "My project"}, {"name": "project-idea", "label": "What is the project you would like funding for?", "value": "sgtrt"}], "legend": "Your project idea"}]}, {"name": "Project activities, outcomes, and milestones", "fieldsets": [{"fields": [{"name": "project-activities-outline", "label": "Briefly outline what your project is aiming to achieve", "value": "sg"}, {"name": "project-activities-first-quarter", "label": "What will be achieved in the first quarter Jan—March 2019?", "value": "srg"}, {"name": "project-activities-first-year", "label": "What will be achieved in the financial year 2019/20?", "value": "s"}], "legend": "Project activities, outcomes, and milestones"}]}, {"name": "Project location", "fieldsets": [{"fields": [{"name": "location", "label": "What regions will your project cover?", "value": "Yorkshire and the Humber"}, {"name": "project-location", "label": "Where will your project take place?", "value": "London"}], "legend": "Project location"}]}, {"name": "Increasing impact", "fieldsets": [{"fields": [{"name": "increasing-impact", "label": "How will this funding support your project to increase your impact?", "value": "iug"}], "legend": "Increasing impact"}]}, {"name": "Evaluation and impact", "fieldsets": [{"fields": [{"name": "project-evaluation", "label": "How will your project help you to improve your learning and help understand more about the impact you are making?", "value": "gstgs"}, {"name": "project-evaluation-future", "label": "How will you monitor and report impact and learning?", "value": "ssgrgr"}], "legend": "Project evaluation"}]}, {"name": "Your project budget", "fieldsets": [{"fields": [{"name": "project-budget-total", "label": "How much grant funding are you applying for in total?", "value": "£100,000"}], "legend": "Funding total"}, {"fields": [{"name": "project-budget-a", "label": "What do you plan to spend the money on for the period until March 2019?", "value": "str"}, {"name": "project-budget-b", "label": "What do you plan to spend the money on for the period from April 2019–March 2020?", "value": "strg"}, {"name": "project-budget-c", "label": "What do you plan to spend the money on for the period April 2020–March 2021?", "value": "str"}], "legend": "Project budget"}]}, {"name": "Your organisation", "fieldsets": [{"fields": [{"name": "organisation-name", "label": "Organisation legal name", "value": "Test Organisation"}], "legend": "Organisation name"}, {"fields": [{"name": "organisation-charity-number", "label": "Registered charity number", "value": "1234565"}, {"name": "organisation-company-number", "label": "Companies House number", "value": "1234565"}], "legend": "Organisation numbers"}]}, {"name": "Main contact", "fieldsets": [{"fields": [{"name": "first-name", "label": "First name", "value": "David"}, {"name": "last-name", "label": "Last name", "value": "Rapson"}, {"name": "email", "label": "Email address", "value": "david.rapson@biglotteryfund.org.uk"}, {"name": "phone-number", "label": "Phone number", "value": "3454102030"}], "legend": "Main contact"}]}];
+
+
+let json = {
+    formId: 'TEST',
+    shortCode: 'DEV-',
+    applicationData: application
+};
+
+for (let i = 0; i < 100; i++) {
+
+    let appJson = Object.assign({}, json);
+    appJson.applicationData[0].version = i;
+    appJson.shortCode += i;
+
+    request({
+        url: "http://localhost:3001/api/application/add",
+        method: "POST",
+        json: true,
+        body: appJson
+    }, function (error, response, body) {
+        if (error) {
+            console.log(error);
+            console.log('error');
+        } else {
+            console.log(body);
+            console.log('success!');
+        }
+    });
+
+}
+
+

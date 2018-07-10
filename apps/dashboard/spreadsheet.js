@@ -38,7 +38,7 @@ function summariseApplications({ baseUrl, formId, applications }) {
             const linkUrl = `${baseUrl}/${application.reference_id}`;
             const coreFields = {
                 'Reference ID': {
-                    f: `=HYPERLINK("${linkUrl}", "${application.reference_id}")`
+                    f: `HYPERLINK("${linkUrl}", "${application.reference_id}")`
                 }
             };
 

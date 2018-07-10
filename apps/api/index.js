@@ -26,7 +26,7 @@ function normaliseError(error) {
                 status: 400,
                 code: 'APPLICATION-003',
                 title: 'No application data'
-            }
+            };
             break;
         default:
             break;
@@ -34,7 +34,6 @@ function normaliseError(error) {
 
     return errorCode;
 }
-
 
 router.post('/application/add', async function(req, res) {
     res.setHeader('Content-Type', 'application/vnd.api+json');

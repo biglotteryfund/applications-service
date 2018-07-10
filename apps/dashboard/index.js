@@ -38,7 +38,6 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
 
             viewData.formTitle = viewData.applicationData.formTitle;
         } else if (formId) {
-
             if (recordsPerPage === 'all') {
                 viewData.applications = await applicationService.getAllApplicationsByForm(formId);
             } else {

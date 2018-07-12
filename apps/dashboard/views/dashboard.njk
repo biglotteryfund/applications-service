@@ -5,7 +5,7 @@
 {% macro renderPagination() %}
     {% if pagination and pagination.totalPages > 1 %}
         <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
+            <ul class="pagination pagination-sm justify-content-center mb-2">
                 {# first / prev #}
                 <li class="page-item{% if pagination.currentPage <= 1%} disabled{% endif %}">
                     <a class="page-link"
@@ -78,7 +78,21 @@
             </ul>
         </nav>
     {% endif %}
+    <p class="text-center mb-3">
+        <small>
+            Showing {{ totalApplications }} total applications / {{ pagination.perPage }} per page / newest first
+            (<a href="?perPage=all">view all</a>)
+        </small>
+    </p>
 {% endmacro %}
+
+{% block head %}
+    <style>
+        .list-group-item:visited {
+            background: #efefef;
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
     {% set dashboardTitle = "Applications Dashboard" %}
@@ -97,81 +111,99 @@
         </ol>
     </nav>
 
-    <h1 class="display-4 mb-4">{{ formTitle }}</h1>
+    <div class="container">
 
-    {% if applicationData %}
-        <h2><strong>Application reference</strong>: {{ applicationData.reference_id }}</h2>
-        <h5>
-            {{ applicationData.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
-            <small title="{{ applicationData.createdAt }}">{{ applicationData.createdAt | timeFromNow }}</small>
-        </h5>
-        <div class="card">
-            <div class="card-body">
-                {% for step in applicationData.application_data %}
-                    <h4>{{ step.name }}</h4>
-                    {% for fieldset in step.fieldsets %}
-                        {% for field in fieldset.fields %}
-                            {% if field.value %}
-                                <h5>{{ field.label }}</h5>
-                                {% if field.type === 'textarea' %}
-                                    <p>{{ field.value | striptags(true) | escape | nl2br }}</p>
-                                {% elseif field.type === 'checkbox' %}
-                                    <p>{{ field.value | joinIfArray(', ') }}</p>
-                                {% else %}
-                                    <p>{{ field.value }}</p>
+        <h1 class="display-4 mb-4">{{ formTitle }}</h1>
+
+        {% if applicationData %}
+            <h2><strong>Application reference</strong>: {{ applicationData.reference_id }}</h2>
+            <h5>
+                {{ applicationData.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
+                <small title="{{ applicationData.createdAt }}">{{ applicationData.createdAt | timeFromNow }}</small>
+            </h5>
+            <div class="card">
+                <div class="card-body">
+                    {% for step in applicationData.application_data %}
+                        <h4>{{ step.name }}</h4>
+                        {% for fieldset in step.fieldsets %}
+                            {% for field in fieldset.fields %}
+                                {% if field.value %}
+                                    <h5>{{ field.label }}</h5>
+                                    {% if field.type === 'textarea' %}
+                                        <p>{{ field.value | striptags(true) | escape | nl2br }}</p>
+                                    {% elseif field.type === 'checkbox' %}
+                                        <p>{{ field.value | joinIfArray(', ') }}</p>
+                                    {% else %}
+                                        <p>{{ field.value }}</p>
+                                    {% endif %}
                                 {% endif %}
-                            {% endif %}
+                            {% endfor %}
                         {% endfor %}
                     {% endfor %}
-                {% endfor %}
+                </div>
             </div>
-        </div>
-    {% elseif forms.length > 0 %}
-        <p>Click a form to view all its applications.</p>
-        <div class="list-group">
-            {% for form in forms %}
-                <a class="list-group-item list-group-item-action flex-column align-items-start"
-                   href="/dashboard/{{ form.form_id}}">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h3 class="h6">{{ form.formTitle }}</h3>
-                        <span class="badge badge-light">{{ form.toJSON().count}}</span>
-                    </div>
-                </a>
-            {% endfor %}
-        </div>
-    {% elseif applications.length > 0 %}
-        <h2 class="mb-4">
-            All applications
-            {% if showDownloadLink %}
-                <a class="btn btn-primary btn-sm" href="?download=1">Download as Excel file</a>
-            {% endif %}
-        </h2>
-        <p>
-            Showing {{ totalApplications }} total / {{ pagination.perPage }} per page
-            (<a href="?perPage=all">view all</a>)
-        </p>
-
-        {{ renderPagination() }}
-
-        <div class="border mb-5">
+        {% elseif forms.length > 0 %}
+            <p>Click a form to view all its applications.</p>
             <div class="list-group">
-                {% for application in applications %}
+                {% for form in forms %}
                     <a class="list-group-item list-group-item-action flex-column align-items-start"
-                       href="/dashboard/{{ formId }}/{{ application.reference_id }}">
+                       href="/dashboard/{{ form.form_id}}">
                         <div class="d-flex w-100 justify-content-between">
-                            <h3 class="h6">
-                                {{ application.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
-                            </h3>
-                            <small title="{{ application.createdAt }}">{{ application.createdAt | timeFromNow }}</small>
+                            <h3 class="h6">{{ form.formTitle }}</h3>
+                            <span class="badge badge-primary badge-pill">{{ form.toJSON().count}}</span>
                         </div>
-                        <p class="mb-0"><strong>Application reference</strong>: {{ application.reference_id }}</p>
                     </a>
                 {% endfor %}
             </div>
-        </div>
+        {% elseif applications.length > 0 %}
 
-        {{ renderPagination() }}
-    {% else %}
-        <p>No results</p>
-    {% endif %}
+            <div class="row justify-content-between align-items-center mb-4">
+                <div class="col-sm">
+                    <h2>
+                        All applications <small>({{ totalApplications }})</small>
+                        {% if showDownloadLink %}
+                            <a class="btn btn-primary btn-sm" href="?download=1">Download as Excel file</a>
+                        {% endif %}
+                    </h2>
+                </div>
+                <div class="col-sm">
+                    <form method="post" action="./search/{{ formId }}" class="form-inline">
+                        <label for="searchField">Search applications:</label>
+                        <input type="text" class="form-control form-control-sm mr-sm-2 ml-sm-2" id="searchField" placeholder="eg. RC-123" name="searchTerm">
+                        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+                    </form>
+                </div>
+            </div>
+
+            {% if searchFailed %}
+                <div class="alert alert-primary" role="alert">
+                    Sorry, there were no matching applications for that search term.
+                </div>
+            {% endif %}
+
+            {{ renderPagination() }}
+
+            <div class="border mb-5">
+                <div class="list-group">
+                    {% for application in applications %}
+                        <a class="list-group-item list-group-item-action flex-column align-items-start"
+                           href="/dashboard/{{ formId }}/{{ application.reference_id }}">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h3 class="h6">
+                                    {{ application.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
+                                </h3>
+                                <small title="{{ application.createdAt }}">Submitted {{ application.createdAt | timeFromNow }}</small>
+                            </div>
+                            <p class="mb-0"><strong>Application reference</strong>: {{ application.reference_id }}</p>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {{ renderPagination() }}
+        {% else %}
+            <p>No results</p>
+        {% endif %}
+
+    </div>
 {% endblock %}

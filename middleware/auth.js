@@ -23,7 +23,7 @@ function ensureAuthenticated(req, res, next) {
 function authMiddleware(req, res, next) {
     passport.authenticate('azuread-openidconnect', {
         response: res,
-        failureRedirect: '/user'
+        failureRedirect: '/user/error'
     })(req, res, next);
 }
 
@@ -31,7 +31,7 @@ function authMiddlewareLogin(req, res, next) {
     passport.authenticate('azuread-openidconnect', {
         response: res,
         resourceURL: config.get('auth.resourceURL'),
-        failureRedirect: '/user'
+        failureRedirect: '/user/error'
     })(req, res, next);
 }
 

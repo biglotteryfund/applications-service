@@ -202,7 +202,9 @@
 
             {{ renderPagination() }}
         {% else %}
-            <p>No results</p>
+            <div class="alert alert-primary" role="alert">
+                Sorry, there haven't been any applications for this fund yet &ndash; watch this space!
+            </div>
         {% endif %}
 
     </div>

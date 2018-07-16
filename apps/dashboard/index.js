@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
+const { isEmpty } = require('lodash');
 
 const auth = require('../../middleware/auth');
 const applicationService = require('../../services/applications');
@@ -13,6 +14,29 @@ function getCleanAbsoluteUrl(req) {
     return `${protocol}://${req.get('host')}${req.baseUrl}${req.path}`;
 }
 
+router.route('/search/:formId').post(auth.ensureAuthenticated, async (req, res, next) => {
+
+    function redirectToError() {
+        req.session.noResultsFound = true;
+        req.session.save(() => {
+            return res.redirect(`/dashboard/${req.params.formId}`);
+        });
+    }
+
+    if (isEmpty(req.body.searchTerm)) {
+        return redirectToError();
+    }
+
+    let application = await applicationService.searchApplicationsByForm(req.params.formId, req.body.searchTerm);
+
+    if (!application) {
+        return redirectToError();
+    } else {
+        return res.redirect(`/dashboard/${req.params.formId}/${application.reference_id}`);
+    }
+
+});
+
 router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (req, res, next) => {
     try {
         const { formId, applicationId } = req.params;
@@ -20,12 +44,17 @@ router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (r
         const recordsPerPage = req.query.perPage || 50;
         const currentPage = parseInt(req.query.page) || 1;
 
+        // reset search param (if found)
+        const searchFailed = req.session.noResultsFound;
+        delete req.session.noResultsFound;
+
         const viewData = {
             formId,
             forms: [],
             applications: [],
             formTitle: null,
-            applicationData: null
+            applicationData: null,
+            searchFailed: searchFailed
         };
 
         if (applicationId) {

@@ -61,6 +61,19 @@ function getApplicationById(applicationId) {
     });
 }
 
+function searchApplicationsByForm(formId, searchTerm) {
+    return Application.findOne({
+        where: {
+            form_id: {
+                [Op.eq]: formId
+            },
+            reference_id: {
+                [Op.eq]: searchTerm,
+            }
+        }
+    });
+}
+
 module.exports = {
     getAllApplicationsByForm,
     getApplicationById,
@@ -68,4 +81,5 @@ module.exports = {
     getPaginatedApplicationsByForm,
     getReferenceId,
     storeApplication,
+    searchApplicationsByForm
 };

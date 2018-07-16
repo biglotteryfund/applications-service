@@ -5,7 +5,7 @@
 {% macro renderPagination() %}
     {% if pagination and pagination.totalPages > 1 %}
         <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
+            <ul class="pagination pagination-sm justify-content-center mb-2">
                 {# first / prev #}
                 <li class="page-item{% if pagination.currentPage <= 1%} disabled{% endif %}">
                     <a class="page-link"
@@ -78,10 +78,17 @@
             </ul>
         </nav>
     {% endif %}
+    <p class="text-center mb-3">
+        <small>
+            Showing {{ totalApplications }} total applications / {{ pagination.perPage }} per page / newest first
+            (<a href="?perPage=all">view all</a>)
+        </small>
+    </p>
 {% endmacro %}
 
 {% block content %}
     {% set dashboardTitle = "Applications Dashboard" %}
+
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             {% if applicationData %}
@@ -128,50 +135,63 @@
         </div>
     {% elseif forms.length > 0 %}
         <p>Click a form to view all its applications.</p>
-        <div class="list-group">
+        <ul class="list-group">
             {% for form in forms %}
-                <a class="list-group-item list-group-item-action flex-column align-items-start"
-                   href="/dashboard/{{ form.form_id}}">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h3 class="h6">{{ form.formTitle }}</h3>
-                        <span class="badge badge-light">{{ form.toJSON().count}}</span>
-                    </div>
+                <a class="list-group-item d-flex justify-content-between align-items-center"
+                    href="/dashboard/{{ form.form_id}}">
+                    {{ form.formTitle }}
+                    <span class="badge badge-primary badge-pill">{{ form.toJSON().count}}</span>
                 </a>
             {% endfor %}
-        </div>
+        </ul>
     {% elseif applications.length > 0 %}
-        <h2 class="mb-4">
-            All applications
-            {% if showDownloadLink %}
-                <a class="btn btn-primary btn-sm" href="?download=1">Download as Excel file</a>
-            {% endif %}
-        </h2>
-        <p>
-            Showing {{ totalApplications }} total / {{ pagination.perPage }} per page
-            (<a href="?perPage=all">view all</a>)
-        </p>
+
+        <div class="d-sm-flex justify-content-between align-items-center mb-4">
+            <h2>
+                All applications <small>({{ totalApplications }})</small>
+                {% if showDownloadLink %}
+                    <a class="btn btn-primary btn-sm" href="?download=1">Download as Excel file</a>
+                {% endif %}
+            </h2>
+            <form method="post" action="./search/{{ formId }}" class="form-inline">
+                <label class="mr-sm-2" for="searchField">Search applications:</label>
+                <div class="input-group">
+                    <input type="text" class="form-control form-control-sm"
+                        id="searchField" placeholder="eg. RC-123" name="searchTerm">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {% if searchFailed %}
+            <div class="alert alert-primary" role="alert">
+                Sorry, there were no matching applications for that search term.
+            </div>
+        {% endif %}
 
         {{ renderPagination() }}
 
-        <div class="border mb-5">
-            <div class="list-group">
-                {% for application in applications %}
-                    <a class="list-group-item list-group-item-action flex-column align-items-start"
-                       href="/dashboard/{{ formId }}/{{ application.reference_id }}">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h3 class="h6">
-                                {{ application.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
-                            </h3>
-                            <small title="{{ application.createdAt }}">{{ application.createdAt | timeFromNow }}</small>
-                        </div>
-                        <p class="mb-0"><strong>Application reference</strong>: {{ application.reference_id }}</p>
-                    </a>
-                {% endfor %}
-            </div>
+        <div class="list-group">
+            {% for application in applications %}
+                <a class="list-group-item list-group-item-action flex-column align-items-start"
+                    href="/dashboard/{{ formId }}/{{ application.reference_id }}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h3 class="h6">
+                            {{ application.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
+                        </h3>
+                        <small title="{{ application.createdAt }}">Submitted {{ application.createdAt | timeFromNow }}</small>
+                    </div>
+                    <p class="mb-0"><strong>Application reference</strong>: {{ application.reference_id }}</p>
+                </a>
+            {% endfor %}
         </div>
 
         {{ renderPagination() }}
     {% else %}
-        <p>No results</p>
+        <div class="alert alert-primary" role="alert">
+            Sorry, there haven't been any applications for this fund yet &ndash; watch this space!
+        </div>
     {% endif %}
 {% endblock %}

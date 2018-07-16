@@ -4,12 +4,20 @@
         <title>{% block title %}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <style>
+            .container-fluid {
+                max-width: 1080px;
+            }
+            .list-group-item:visited {
+                background: #efefef;
+            }
+        </style>
         {% block head %}{% endblock %}
     </head>
     <body>
         {% block navbar %}
-            <nav class="navbar navbar-dark bg-dark">
-                <div class="container">
+            <nav class="navbar navbar-dark bg-dark mb-4">
+                <div class="container-fluid">
                     <div class="navbar-header">
                         <span class="navbar-brand">Big Lottery Fund</span>
                     </div>
@@ -17,7 +25,7 @@
             </nav>
         {% endblock %}
 
-        <div class="container pt-4">
+        <div class="container-fluid mb-4">
             {% block content %}{% endblock %}
         </div>
 

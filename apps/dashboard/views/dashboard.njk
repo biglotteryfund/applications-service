@@ -86,16 +86,9 @@
     </p>
 {% endmacro %}
 
-{% block head %}
-    <style>
-        .list-group-item:visited {
-            background: #efefef;
-        }
-    </style>
-{% endblock %}
-
 {% block content %}
     {% set dashboardTitle = "Applications Dashboard" %}
+
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             {% if applicationData %}
@@ -111,99 +104,94 @@
         </ol>
     </nav>
 
-    <div class="container">
+    <h1 class="display-4 mb-4">{{ formTitle }}</h1>
 
-        <h1 class="display-4 mb-4">{{ formTitle }}</h1>
-
-        {% if applicationData %}
-            <h2><strong>Application reference</strong>: {{ applicationData.reference_id }}</h2>
-            <h5>
-                {{ applicationData.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
-                <small title="{{ applicationData.createdAt }}">{{ applicationData.createdAt | timeFromNow }}</small>
-            </h5>
-            <div class="card">
-                <div class="card-body">
-                    {% for step in applicationData.application_data %}
-                        <h4>{{ step.name }}</h4>
-                        {% for fieldset in step.fieldsets %}
-                            {% for field in fieldset.fields %}
-                                {% if field.value %}
-                                    <h5>{{ field.label }}</h5>
-                                    {% if field.type === 'textarea' %}
-                                        <p>{{ field.value | striptags(true) | escape | nl2br }}</p>
-                                    {% elseif field.type === 'checkbox' %}
-                                        <p>{{ field.value | joinIfArray(', ') }}</p>
-                                    {% else %}
-                                        <p>{{ field.value }}</p>
-                                    {% endif %}
+    {% if applicationData %}
+        <h2><strong>Application reference</strong>: {{ applicationData.reference_id }}</h2>
+        <h5>
+            {{ applicationData.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
+            <small title="{{ applicationData.createdAt }}">{{ applicationData.createdAt | timeFromNow }}</small>
+        </h5>
+        <div class="card">
+            <div class="card-body">
+                {% for step in applicationData.application_data %}
+                    <h4>{{ step.name }}</h4>
+                    {% for fieldset in step.fieldsets %}
+                        {% for field in fieldset.fields %}
+                            {% if field.value %}
+                                <h5>{{ field.label }}</h5>
+                                {% if field.type === 'textarea' %}
+                                    <p>{{ field.value | striptags(true) | escape | nl2br }}</p>
+                                {% elseif field.type === 'checkbox' %}
+                                    <p>{{ field.value | joinIfArray(', ') }}</p>
+                                {% else %}
+                                    <p>{{ field.value }}</p>
                                 {% endif %}
-                            {% endfor %}
+                            {% endif %}
                         {% endfor %}
                     {% endfor %}
-                </div>
-            </div>
-        {% elseif forms.length > 0 %}
-            <p>Click a form to view all its applications.</p>
-            <ul class="list-group">
-                {% for form in forms %}
-                    <a class="list-group-item d-flex justify-content-between align-items-center"
-                       href="/dashboard/{{ form.form_id}}">
-                        {{ form.formTitle }}
-                        <span class="badge badge-primary badge-pill">{{ form.toJSON().count}}</span>
-                    </a>
                 {% endfor %}
-            </ul>
-        {% elseif applications.length > 0 %}
+            </div>
+        </div>
+    {% elseif forms.length > 0 %}
+        <p>Click a form to view all its applications.</p>
+        <ul class="list-group">
+            {% for form in forms %}
+                <a class="list-group-item d-flex justify-content-between align-items-center"
+                    href="/dashboard/{{ form.form_id}}">
+                    {{ form.formTitle }}
+                    <span class="badge badge-primary badge-pill">{{ form.toJSON().count}}</span>
+                </a>
+            {% endfor %}
+        </ul>
+    {% elseif applications.length > 0 %}
 
-            <div class="row justify-content-between align-items-center mb-4">
-                <div class="col-sm">
-                    <h2>
-                        All applications <small>({{ totalApplications }})</small>
-                        {% if showDownloadLink %}
-                            <a class="btn btn-primary btn-sm" href="?download=1">Download as Excel file</a>
-                        {% endif %}
-                    </h2>
-                </div>
-                <div class="col-sm">
-                    <form method="post" action="./search/{{ formId }}" class="form-inline">
-                        <label for="searchField">Search applications:</label>
-                        <input type="text" class="form-control form-control-sm mr-sm-2 ml-sm-2" id="searchField" placeholder="eg. RC-123" name="searchTerm">
+        <div class="d-sm-flex justify-content-between align-items-center mb-4">
+            <h2>
+                All applications <small>({{ totalApplications }})</small>
+                {% if showDownloadLink %}
+                    <a class="btn btn-primary btn-sm" href="?download=1">Download as Excel file</a>
+                {% endif %}
+            </h2>
+            <form method="post" action="./search/{{ formId }}" class="form-inline">
+                <label class="mr-sm-2" for="searchField">Search applications:</label>
+                <div class="input-group">
+                    <input type="text" class="form-control form-control-sm"
+                        id="searchField" placeholder="eg. RC-123" name="searchTerm">
+                    <div class="input-group-append">
                         <button type="submit" class="btn btn-primary btn-sm">Search</button>
-                    </form>
+                    </div>
                 </div>
-            </div>
+            </form>
+        </div>
 
-            {% if searchFailed %}
-                <div class="alert alert-primary" role="alert">
-                    Sorry, there were no matching applications for that search term.
-                </div>
-            {% endif %}
-
-            {{ renderPagination() }}
-
-            <div class="border mb-5">
-                <div class="list-group">
-                    {% for application in applications %}
-                        <a class="list-group-item list-group-item-action flex-column align-items-start"
-                           href="/dashboard/{{ formId }}/{{ application.reference_id }}">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h3 class="h6">
-                                    {{ application.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
-                                </h3>
-                                <small title="{{ application.createdAt }}">Submitted {{ application.createdAt | timeFromNow }}</small>
-                            </div>
-                            <p class="mb-0"><strong>Application reference</strong>: {{ application.reference_id }}</p>
-                        </a>
-                    {% endfor %}
-                </div>
-            </div>
-
-            {{ renderPagination() }}
-        {% else %}
+        {% if searchFailed %}
             <div class="alert alert-primary" role="alert">
-                Sorry, there haven't been any applications for this fund yet &ndash; watch this space!
+                Sorry, there were no matching applications for that search term.
             </div>
         {% endif %}
 
-    </div>
+        {{ renderPagination() }}
+
+        <div class="list-group">
+            {% for application in applications %}
+                <a class="list-group-item list-group-item-action flex-column align-items-start"
+                    href="/dashboard/{{ formId }}/{{ application.reference_id }}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h3 class="h6">
+                            {{ application.createdAt | formatDate(DATE_FORMATS.fullTimestamp) }}
+                        </h3>
+                        <small title="{{ application.createdAt }}">Submitted {{ application.createdAt | timeFromNow }}</small>
+                    </div>
+                    <p class="mb-0"><strong>Application reference</strong>: {{ application.reference_id }}</p>
+                </a>
+            {% endfor %}
+        </div>
+
+        {{ renderPagination() }}
+    {% else %}
+        <div class="alert alert-primary" role="alert">
+            Sorry, there haven't been any applications for this fund yet &ndash; watch this space!
+        </div>
+    {% endif %}
 {% endblock %}

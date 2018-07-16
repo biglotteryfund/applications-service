@@ -17,12 +17,22 @@ function getTransformer(formId) {
         case 'building-connections-fund':
             return function(fields) {
                 return {
-                    'Project location': fields['location'],
-                    'Organisation Name': fields['organisation-name'],
-                    'Address: Street': fields['address-building-street'],
-                    'Address: Town or City': fields['address-town-city'],
-                    'Address: County': fields['address-county'],
-                    'Address: Postcode': fields['address-postcode']
+                    'Organisation name': fields['organisation-name'],
+                    'Main contact name': fields['first-name'],
+                    'Address: street': fields['address-building-street'],
+                    'Address: town or city': fields['address-town-city'],
+                    'Address: county': fields['address-county'],
+                    'Address: postcode': fields['address-postcode'],
+                    'Project region': fields['location'],
+                    'Project location': fields['project-location'],
+                    'Total amount requested': fields['project-budget-total'],
+                    'Project start date': '',
+                    'Length of funding': '',
+                    'Theme 1': '',
+                    'Theme 2': '',
+                    'Theme 3': '',
+                    'Assessor name': '',
+                    Recommendation: ''
                 };
             };
         default:

@@ -118,7 +118,7 @@
                                 {% elseif field.type === 'checkbox' %}
                                     <p>{{ field.value | joinIfArray(', ') }}</p>
                                 {% else %}
-                                    <p>{{ field.value }}</p>
+                                    <p>{{ field.value | nl2br | safe }}</p>
                                 {% endif %}
                             {% endif %}
                         {% endfor %}

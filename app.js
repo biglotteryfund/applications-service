@@ -85,6 +85,11 @@ function initViewEngine() {
         return moment(dateString).tz("Europe/London").fromNow();
     });
 
+    // via https://stackoverflow.com/a/35260295
+    templateEnv.addFilter('nl2br', function(str) {
+        return str.replace(/\r|\n|\r\n/g, '<br />');
+    });
+
     app.set('view engine', 'njk').set('engineEnv', templateEnv);
 }
 

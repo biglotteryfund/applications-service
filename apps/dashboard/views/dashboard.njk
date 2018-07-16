@@ -144,17 +144,15 @@
             </div>
         {% elseif forms.length > 0 %}
             <p>Click a form to view all its applications.</p>
-            <div class="list-group">
+            <ul class="list-group">
                 {% for form in forms %}
-                    <a class="list-group-item list-group-item-action flex-column align-items-start"
+                    <a class="list-group-item d-flex justify-content-between align-items-center"
                        href="/dashboard/{{ form.form_id}}">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h3 class="h6">{{ form.formTitle }}</h3>
-                            <span class="badge badge-primary badge-pill">{{ form.toJSON().count}}</span>
-                        </div>
+                        {{ form.formTitle }}
+                        <span class="badge badge-primary badge-pill">{{ form.toJSON().count}}</span>
                     </a>
                 {% endfor %}
-            </div>
+            </ul>
         {% elseif applications.length > 0 %}
 
             <div class="row justify-content-between align-items-center mb-4">

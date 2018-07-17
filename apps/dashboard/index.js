@@ -15,7 +15,6 @@ function getCleanAbsoluteUrl(req) {
 }
 
 router.route('/search/:formId').post(auth.ensureAuthenticated, async (req, res, next) => {
-
     function redirectToError() {
         req.session.noResultsFound = true;
         req.session.save(() => {
@@ -34,7 +33,6 @@ router.route('/search/:formId').post(auth.ensureAuthenticated, async (req, res, 
     } else {
         return res.redirect(`/dashboard/${req.params.formId}/${application.reference_id}`);
     }
-
 });
 
 router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (req, res, next) => {

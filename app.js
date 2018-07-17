@@ -64,7 +64,7 @@ function initViewEngine() {
         autoescape: true,
         express: app,
         noCache: isDev === true,
-        watch: isDev  === true
+        watch: isDev === true
     });
 
     /**
@@ -73,7 +73,7 @@ function initViewEngine() {
      * @param {String} format
      * @see https://momentjs.com/docs/#/displaying/format/
      */
-    templateEnv.addFilter('formatDate', function(dateString, format) {
+    templateEnv.addFilter('formatDate', function (dateString, format) {
         return moment(dateString).tz("Europe/London").format(format);
     });
 
@@ -81,9 +81,15 @@ function initViewEngine() {
      * View helper to represent date as relative time
      * @param {String} dateString
      */
-    templateEnv.addFilter('timeFromNow', function(dateString) {
+    templateEnv.addFilter('timeFromNow', function (dateString) {
         return moment(dateString).tz("Europe/London").fromNow();
     });
+
+    /**
+     * View helper to check if a value is an array
+     * @param {Array} xs
+     */
+    templateEnv.addFilter('isArray', xs => Array.isArray(xs));
 
     app.set('view engine', 'njk').set('engineEnv', templateEnv);
 }

@@ -107,6 +107,7 @@ app.use(auth.globalMiddleware());
 /**
  * Mount routers
  */
+app.get('/', (req, res) => res.redirect('/dashboard'));
 app.use('/api', api);
 app.use('/status', status);
 app.use('/dashboard', dashboard);

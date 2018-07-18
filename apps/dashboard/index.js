@@ -14,7 +14,9 @@ function getCleanAbsoluteUrl(req) {
     return `${protocol}://${req.get('host')}${req.baseUrl}${req.path}`;
 }
 
-router.route('/search/:formId').post(auth.ensureAuthenticated, async (req, res, next) => {
+router.use(auth.ensureAuthenticated);
+
+router.route('/search/:formId').post(async (req, res) => {
     function redirectToError() {
         req.session.noResultsFound = true;
         req.session.save(() => {
@@ -35,7 +37,7 @@ router.route('/search/:formId').post(auth.ensureAuthenticated, async (req, res, 
     }
 });
 
-router.route('/:formId?/:applicationId?').get(auth.ensureAuthenticated, async (req, res, next) => {
+router.route('/:formId?/:applicationId?').get(async (req, res, next) => {
     try {
         const { formId, applicationId } = req.params;
 

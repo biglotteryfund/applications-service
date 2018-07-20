@@ -18,7 +18,8 @@ function getTransformer(formId) {
             return function(fields) {
                 return {
                     'Organisation name': fields['organisation-name'],
-                    'Main contact name': fields['first-name'],
+                    'Main contact: First name': fields['first-name'],
+                    'Main contact: Last name': fields['last-name'],
                     'Address: street': fields['address-building-street'],
                     'Address: town or city': fields['address-town-city'],
                     'Address: county': fields['address-county'],

@@ -50,6 +50,10 @@ function summariseApplications({ baseUrl, formId, applications }) {
             const coreFields = {
                 'Reference ID': {
                     f: `HYPERLINK("${linkUrl}", "${application.reference_id}")`
+                },
+                'Date submitted': {
+                    t: 'd',
+                    v: new Date(application.createdAt)
                 }
             };
 

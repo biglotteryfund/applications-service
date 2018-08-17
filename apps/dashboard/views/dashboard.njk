@@ -2,6 +2,10 @@
 
 {% block title %}{% if applicationData %}Application {{ applicationData.reference_id }} | {{ formTitle }}{% else %}{{ formTitle }} | All applications{% endif %}{% endblock %}
 
+{% block head %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js" integrity="sha256-N4u5BjTLNwmGul6RgLoESPNqDFVUibVuOYhP4gJgrew=" crossorigin="anonymous"></script>
+{% endblock %}
+
 {% macro renderPagination() %}
     {% if pagination and pagination.totalPages > 1 %}
         <nav aria-label="Page navigation example">
@@ -170,6 +174,72 @@
         {% endif %}
 
         {{ renderPagination() }}
+
+        {% if chartData %}
+            <h2 class="mb-4">Applications by date</h2>
+            <div style="height: 350px" class="border mb-4">
+                <canvas id="js-chart" width="400" height="400"></canvas>
+            </div>
+            <script>
+                var ctx = document.getElementById('js-chart');
+
+                var config = {
+                    type: 'bar',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Number of applications',
+                                backgroundColor: '#17a2b8',
+                                borderColor: '#17a2b8',
+                                fill: false,
+                                data: {{ chartData | dump | safe }}
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        title: {
+                            display: false,
+                            text: "Applications over time"
+                        },
+                        scales: {
+                            xAxes: [{
+                                type: "time",
+                                display: true,
+                                scaleLabel: {
+                                    display: false,
+                                    labelString: 'Date'
+                                },
+                                ticks: {
+                                    major: {
+                                        fontStyle: "bold",
+                                        fontColor: "#FF0000"
+                                    }
+                                },
+                                time: {
+                                    round: 'day',
+                                    unit: 'day'
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Number of applications'
+                                },
+                                ticks: {
+                                    beginAtZero: true,
+                                    stepSize: 10
+                                }
+                            }]
+                        }
+                    }
+                };
+
+                var myChart = new Chart(ctx, config);
+            </script>
+        {% endif %}
 
         <div class="list-group">
             {% for application in applications %}

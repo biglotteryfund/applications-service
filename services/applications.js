@@ -1,6 +1,6 @@
 'use strict';
 const hash = require('object-hash');
-const { Op, fn } = require('sequelize');
+const { Op, fn, col } = require('sequelize');
 
 const { Application } = require('../models');
 
@@ -32,6 +32,18 @@ async function getAllApplicationsByForm(formId) {
         order: [['updatedAt', 'DESC']],
         where: { form_id: { [Op.eq]: formId } }
     })
+}
+
+async function getApplicationChartData(formId) {
+    return Application.findAll({
+        where: { form_id: { [Op.eq]: formId } },
+        attributes: [
+            [fn('DATE_FORMAT', col('createdAt'), '"%Y-%m-%d"'), 'x'],
+            [fn('COUNT', col('id')), 'y']
+        ],
+        raw: true,
+        group: ['x']
+    });
 }
 
 async function getPaginatedApplicationsByForm(formId, recordsPerPage = 50, currentPage = 1) {
@@ -81,5 +93,6 @@ module.exports = {
     getPaginatedApplicationsByForm,
     getReferenceId,
     storeApplication,
-    searchApplicationsByForm
+    searchApplicationsByForm,
+    getApplicationChartData
 };

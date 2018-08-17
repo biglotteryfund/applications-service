@@ -78,7 +78,7 @@
             </ul>
         </nav>
     {% endif %}
-    <p class="text-center mb-3">
+    <p class="text-center mb-2">
         <small>
             Showing {{ totalApplications }} total applications / {{ pagination.perPage }} per page / newest first
             (<a href="?perPage=all">view all</a>)
@@ -171,7 +171,7 @@
 
         {{ renderPagination() }}
 
-        <div class="list-group">
+        <div class="list-group mb-4">
             {% for application in applications %}
                 <a class="list-group-item list-group-item-action flex-column align-items-start"
                     href="/dashboard/{{ formId }}/{{ application.reference_id }}">

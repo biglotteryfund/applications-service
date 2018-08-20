@@ -6,33 +6,33 @@ const applicationsService = require('../../services/applications');
 
 const router = express.Router();
 
-function normaliseError(error) {
-    let errorCode = {
-        status: 400,
-        code: 'APPLICATION-001',
-        title: 'Unknown error'
-    };
-
-    switch (error.message) {
+function normaliseError(rawError) {
+    switch (rawError.message) {
         case 'Validation error':
-            errorCode = {
+            return {
                 status: 400,
                 code: 'APPLICATION-002',
-                title: 'Validation error'
-            };
-            break;
+                title: 'Validation error',
+                errors: rawError.errors.map(e => {
+                    delete e.instance;
+                    return e;
+                })
+            }
         case 'EmptyApplicationData':
-            errorCode = {
+            return {
                 status: 400,
                 code: 'APPLICATION-003',
-                title: 'No application data'
-            };
-            break;
+                title: 'No application data',
+                message: rawError.message
+            }
         default:
-            break;
+            return {
+                status: 400,
+                code: 'APPLICATION-001',
+                title: 'Unknown error',
+                message: rawError.message
+            }
     }
-
-    return errorCode;
 }
 
 router.post('/application/add', async function(req, res) {

@@ -12,6 +12,10 @@ function getReferenceId(shortCode, applicationData) {
 }
 
 function storeApplication({ formId, shortCode, applicationData }) {
+    if (!shortCode) {
+        return Promise.reject(new Error('Missing shortCode'));
+    }
+
     return Application.create({
         form_id: formId,
         reference_id: getReferenceId(shortCode, applicationData),

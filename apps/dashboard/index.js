@@ -84,6 +84,8 @@ router.route('/:formId?/:applicationId?').get(async (req, res, next) => {
                     perPage: recordsPerPage,
                     totalPages: paginatedApplications.numPages
                 };
+
+                viewData.chartData = await applicationService.getApplicationChartData(formId);
             }
 
             if (viewData.applications.length < 1) {

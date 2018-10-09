@@ -1,8 +1,40 @@
+# Environment variables
+env:
+  global:
+    # travis encrypt AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+    - secure: "LllXmkyNsDOCOx8b0oOzmysIw/eGJjjAisFCgHdKP2L7yurvAlupyQzAvhFP2mB4+mENyDeckV0JzsuevRdoQCjiO9EvBbTO39kEedl3SUWZBbhemCpqumlLGgWhymu5+i1aB9VNGZ8MV+wyyYLvcwQbyf3bLMgH3vOCIwDRmxwucdenpzf55RCwmguX8oYyz8DfjgWCKmWopepA7gMDxCDATcVu1lmxkt9jbTT1ZeqYHOiMrgYy8sgObeSjH8fRYYOWI79m1cST24xRDX2SujQRfdHJYVmVQgDmOMF5t4rpNn76gQraP0dWyeOuEhIhlP7nC1AmiacDPhrca55VPaPxHmhteqwNxtSQl64HQjh26etmSLruof2+Y6Pe88oc817heEAcAE9Q6LOK2OzESK48AynjduJ8gzDRbkVtO437JNwYhJcEsXu9MRCFAt/xvnye50c5rEEUI52F8A6n1qOlIeGsLTes1cxiuJwFzVhPLDG4BtGaYCQ6Ie4C/q8Jjh7atyhO/wWJGdoPDNqyBu5FJLJNY7428wWjc7EvafCR46X0FFS0J3WM/bI/PEJmTCNUusXlWTQoO7tDF2yoinC3hEJHNa0bTiwwjwo69WNrhwBDD4QP1wbl3y52islC0XesujXzatQNqVG2c5AFFH/ilAO8nPNdXfto5cZPxFI="
+    # travis encrypt AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+    - secure: "AtelhAWZd9qNZmUUxAgKHw5eHMILMyEARaL77dOTiG/YTGjSGKlT146XmOkwbF/4qHaQf/t8z1HiXI0cwWK9hgSYEaNzaOq3ttceZb7+LE2cmqduMoBBPtQ5gO4BHGM0Kk1iQbavLgnxPVXHDB6dCC+aHUYjK4StgVNUmzS5aH5o9RxmteWq0MZ7Jkw7axejh8n+vr1nqY1nNCg3P/DmiLUUjekwFXDAIM/V3xUOjAiKgsiEnb6Rg02UJO9QOBQeS0iVVuqkAQhH1f05GPSBlsTsaRZeQMVibwTmPoBqe0dC7+IHwbLuIY0Wyvn6LwKN2wM8LEpHm/YeGquk1UOc8gIko98nhoM/Zhx/J1FakojshlM8GOQUjWriKSf+32pRTpEWG4KzCJZmMNupRtcumVGuvo+5KQ7sB7aBZET3d9iaAMLK2aULm0A2inSSRaoCP4BOhYXZowMtzd0+XBmHKDCLu7srmG+TxbVrdSILPeaQnqhW21uZ9v1p3NslXP4Qut+1j7qhDYvXvvGnbyh3hieIpSlWQgIV3gPcB5ovbH7yUQG+n3a8sXvUa12izlVqAs0EqTGXsdfinZBGq7hoa2+gTSIbZSLpLrX8fX8DFpW1A/uGqCHM2NT3aDqP1wtk3USbZMqgzE9iQFvtkxUuOsWhmJpcbI0doWZ8syve/F4="
+
+# Defaults
 language: node_js
 node_js:
   - "8"
-before_install:
-  - npm i -g npm@6
+
+# Cache locations
 cache:
   directories:
     - "node_modules"
+
+# Build stages
+before_install:
+  - npm i -g npm@6
+
+# Deploy steps
+deploy:
+- provider: elasticbeanstalk
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  region: eu-west-2
+  app: Applications Service
+  env: applications-service-test
+  on:
+    branch: master
+- provider: elasticbeanstalk
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  region: eu-west-2
+  app: Applications Service
+  env: applications-service-production-blue
+  on:
+    tags: true

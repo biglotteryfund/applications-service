@@ -37,6 +37,18 @@ function getTransformer(formId) {
                     Recommendation: ''
                 };
             };
+        case 'youth-capacity-fund':
+            return function(fields) {
+                return {
+                    'Organisation Name': fields['organisation-name'],
+                    'Project location': fields['location'],
+                    'Programme Aim': fields['how-you-will-use'],
+                    'Organisation annual income': fields['annual-income'],
+                    'Main contact: Name': fields['contact-name'],
+                    'Main contact: Email address': fields['contact-email'],
+                    'Main contact: Phone': fields['contact-phone']
+                };
+            };
         default:
             return null;
     }
